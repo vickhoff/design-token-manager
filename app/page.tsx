@@ -38,17 +38,19 @@ export default function Home() {
   }
 
   async function getFolder() {
-    const selectedFolder: FileSystemDirectoryHandle = await window.showDirectoryPicker({ mode: 'read' })
-    for await (const [name, handle] of selectedFolder.entries()) {
+    const root = await window.showDirectoryPicker({ mode: 'read' })
+  
+    for await (const [name, handle] of root.entries()) {
       if (name === "tokens.json" && handle.kind === "file") {
         const file = await handle.getFile()
         const contents = await file.text()
         console.log(contents)
         return contents
       }
-      console.log("No tokens.json in this folder")
-      return null
     }
+  
+    console.log("tokens.json not found in this folder")
+    return null
   }
 
   return (
