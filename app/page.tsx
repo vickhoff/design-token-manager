@@ -1,6 +1,7 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
+import { getFolder, getFileContent } from "@/lib/tokenFiles";
 import {
   Card,
   CardAction,
@@ -9,48 +10,12 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { log } from "console";
+} from "@/components/ui/card";
 
 export default function Home() {
-
-  const options: OpenFilePickerOptions = {
-    types: [
-      {
-        description: "Design tokens",
-        accept: {
-          "text/css": [".css"],
-          "application/json": [".json"],
-        },
-      },
-    ],
-    excludeAcceptAllOption: true,
-  };
-  
-  async function getFile() {
-    // Open file picker and destructure the result the first handle
-  
-    const [fileHandle] = await window.showOpenFilePicker(options);
-    const file = await fileHandle.getFile();
-    const contents = await file.text();
-    console.log(contents)
-    return contents
-  }
-
-  async function getFolder() {
-    const root = await window.showDirectoryPicker({ mode: 'read' })
-  
-    for await (const [name, handle] of root.entries()) {
-      if (name === "tokens.json" && handle.kind === "file") {
-        const file = await handle.getFile()
-        const contents = await file.text()
-        console.log(contents)
-        return contents
-      }
-    }
-  
-    console.log("tokens.json not found in this folder")
-    return null
+  async function handleChooseFolder() {
+    const root = await getFolder();
+    await getFileContent(root);
   }
 
   return (
@@ -60,10 +25,12 @@ export default function Home() {
         <Card>
           <CardHeader>
             <CardTitle>Choose your file</CardTitle>
-            <CardDescription>Choose the file containing your tokens</CardDescription>
+            <CardDescription>
+              Choose the file containing your tokens
+            </CardDescription>
           </CardHeader>
           <CardFooter>
-            <Button onClick={getFolder}>Choose folder</Button>
+            <Button onClick={handleChooseFolder}>Choose folder</Button>
           </CardFooter>
         </Card>
       </main>

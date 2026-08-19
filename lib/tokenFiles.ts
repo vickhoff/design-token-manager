@@ -1,13 +1,13 @@
-async function getFolder() {
-  const root = await window.showDirectoryPicker({ mode: "read" });
-  return root;
+export async function getFolder() {
+  return await window.showDirectoryPicker({ mode: "read" });
 }
 
-async function getFileContent() {
-  const root = await getFolder();
-
+export async function getFileContent(root: FileSystemDirectoryHandle) {
   for await (const [name, handle] of root.entries()) {
-    if (name === "tokens.json" && handle.kind === "file") {
+    if (
+      (name === "tokens.json" || name === "tokens.css") &&
+      handle.kind === "file"
+    ) {
       const file = await handle.getFile();
       const contents = await file.text();
       console.log(contents);
@@ -15,6 +15,6 @@ async function getFileContent() {
     }
   }
 
-  console.log("tokens.json not found in this folder");
+  console.log("tokens.json or tokens.css not found in this folder");
   return null;
 }
