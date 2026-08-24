@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -14,7 +15,9 @@ export default function Home() {
             </h1>
             <p>Visualize and edit your tokens</p>
           </div>
-          <Button>Get started</Button>
+          <Button size="lg" render={<Link href="/dashboard"></Link>}>
+            Get started
+          </Button>
         </section>
       </main>
     </div>
