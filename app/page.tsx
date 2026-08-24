@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { getFolder, getFileContent } from "@/lib/tokenFiles";
+import { getFolder, getFileContent, DEFAULT_TOKENS } from "@/lib/tokenFiles";
 import {
   Card,
   CardAction,
@@ -15,7 +15,12 @@ import {
 export default function Home() {
   async function handleChooseFolder() {
     const root = await getFolder();
-    await getFileContent(root);
+    try {
+      const contents = await getFileContent(root);
+      console.log("loaded:", contents);
+    } catch (error) {
+      console.log("falling back to defaults:", DEFAULT_TOKENS);
+    }
   }
 
   return (
