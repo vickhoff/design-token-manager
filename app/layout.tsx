@@ -1,8 +1,13 @@
 import type { Metadata } from "next";
-import { Figtree, Geist_Mono } from "next/font/google";
+import { Figtree, Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 const figtree = Figtree({
+  variable: "--font-sans",
+  subsets: ["latin"],
+});
+
+const geist = Geist({
   variable: "--font-sans",
   subsets: ["latin"],
 });
@@ -21,9 +26,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${figtree.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geist.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col bg-white font-sans dark:bg-black bg-[radial-gradient(circle,#00000022_1px,transparent_1px)] [background-size:12px_12px]">
+        {children}
+      </body>
     </html>
   );
 }
