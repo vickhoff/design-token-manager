@@ -1,0 +1,19 @@
+[
+  { "label": "font.mono", "type": "font" },
+  { "label": "spacing.md", "type": "spacing" },
+  { "label": "color.foreground.accent", "type": "color", "value": "#1B91FF" },
+  { "label": "color.surface.warning", "type": "color", "value": "#eab308" },
+  { "label": "spacing.xs", "type": "spacing" },
+  { "label": "color.border.default", "type": "color", "value": "#000000" },
+  { "label": "font.sans", "type": "font" },
+  { "label": "color.surface.success", "type": "color", "value": "#47D718" },
+  { "label": "color.foreground.subtle", "type": "color", "value": "#707070" },
+  { "label": "spacing.lg", "type": "spacing" },
+  { "label": "color.surface.default", "type": "color", "value": "#ffffff" },
+  { "label": "font.serif", "type": "font" },
+  { "label": "color.surface.destructive", "type": "color", "value": "#E91B1B" },
+  { "label": "color.foreground.default", "type": "color", "value": "#000000" },
+  { "label": "spacing.sm", "type": "spacing" },
+  { "label": "color.surface.accent", "type": "color", "value": "#1B91FF" },
+  { "label": "color.surface.subtle", "type": "color", "value": "#707070" }
+]
