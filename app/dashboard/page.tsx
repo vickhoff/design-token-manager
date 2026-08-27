@@ -1,7 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { getFolder, getFileContent, DEFAULT_TOKENS } from "@/lib/tokenFiles";
+import {
+  getFolder,
+  getFileContent,
+  DEFAULT_TOKENS,
+} from "@/lib/tokenFileSystem";
 import {
   Card,
   CardAction,
@@ -13,37 +18,45 @@ import {
 } from "@/components/ui/card";
 import { TokenTable } from "./_components/TokenTable";
 
+type Status = "empty" | "loading" | "loaded" | "error";
+
 export default function Dashboard() {
+  const [status, setStatus] = useState<Status>("empty");
+
   async function handleChooseFolder() {
-    const root = await getFolder();
     try {
+      const root = await getFolder();
       const contents = await getFileContent(root);
+      setStatus("loaded");
       console.log("loaded:", contents);
     } catch (error) {
-      console.log("falling back to defaults:", DEFAULT_TOKENS);
+      console.log("falling back to defaults:", DEFAULT_TOKENS, error);
+      setStatus("error");
     }
   }
 
   return (
     <div className="flex flex-col flex-1 items-center justify-center font-sans text-(--color-foreground-default)">
       <main className="flex items-center justify-center flex-1 w-full max-w-7xl flex-col items-center py-32 px-16 sm:items-start">
-        <Card>
-          <CardHeader>
-            <CardTitle>Choose your file</CardTitle>
-            <CardDescription>
-              Choose the file containing your tokens
-            </CardDescription>
-          </CardHeader>
-          <CardFooter className="flex-col gap-8>">
-            <Button className="w-full" onClick={handleChooseFolder}>
-              Choose folder
-            </Button>
-            <Button variant="outline" className="w-full">
-              Start with sample tokens
-            </Button>
-          </CardFooter>
-        </Card>
-        <TokenTable />
+        {status === "loaded" && <TokenTable />}
+        {status === "empty" && (
+          <Card className="max-w-xs">
+            <CardHeader>
+              <CardTitle>Choose your file</CardTitle>
+              <CardDescription>
+                Choose the file containing your tokens
+              </CardDescription>
+            </CardHeader>
+            <CardFooter className="flex-col gap-8>">
+              <Button className="w-full" onClick={handleChooseFolder}>
+                Choose folder
+              </Button>
+              <Button variant="outline" className="w-full">
+                Start with sample tokens
+              </Button>
+            </CardFooter>
+          </Card>
+        )}
       </main>
     </div>
   );

@@ -24,6 +24,6 @@ export async function getFileContent(root: FileSystemDirectoryHandle) {
       const contents = await file.text();
       return contents;
     }
-    throw new Error("tokens.json or tokens.css not found in this folder");
   }
+  throw new Error("tokens.json or tokens.css not found in this folder");
 }
