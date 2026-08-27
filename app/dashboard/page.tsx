@@ -11,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { TokenTable } from "./_components/TokenTable";
 
 export default function Dashboard() {
   async function handleChooseFolder() {
@@ -42,6 +43,7 @@ export default function Dashboard() {
             </Button>
           </CardFooter>
         </Card>
+        <TokenTable />
       </main>
     </div>
   );
