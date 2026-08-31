@@ -1,0 +1,23 @@
+/* this whole comment should be stripped, not warned about */
+body {
+  color: red; /* declared outside :root — silently ignored */
+}
+
+:root {
+  /* comment inside :root */
+  --unknown-brand-primary: #fff; /* bad type prefix */
+  --color: #ffffff; /* missing name segment */
+  --typography-heading-oops: 16px; /* bad typography suffix */
+  --typography-orphan-family: "Arial"; /* incomplete triplet — only family present */
+
+  --color-brand-primary: #111111;
+  --color-brand-primary: #222222; /* duplicate — last wins, with warning */
+
+  --color-brand-secondary: var(
+    --color-brand-primary
+  ); /* var() reference — unsupported, invalid value */
+
+  --dimension-spacing-lg: 24px; /* valid, should still parse fine */
+
+  font-family: sans-serif; /* non-custom-property inside :root — silently ignored */
+}
