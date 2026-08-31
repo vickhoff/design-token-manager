@@ -10,10 +10,14 @@ import {
 } from "@/components/ui/table";
 import { TableInput } from "./TableInput";
 
-export function TokenTable() {
+interface TokenTableProps {
+  type: string;
+}
+
+export function TokenTable({ type }: TokenTableProps) {
   return (
-    <>
-      <h2>Color</h2>
+    <section className="bg-(--color-surface-default) border border-(--color-border-default) rounded p-4">
+      <h2>{type}</h2>
       <Table>
         <TableHeader>
           <TableRow>
@@ -24,7 +28,7 @@ export function TokenTable() {
         <TableBody>
           <TableRow>
             <TableCell>
-              <TableInput placeholder="token.name" />
+              <p>color.surface.default</p>
             </TableCell>
             <TableCell>
               <TableInput placeholder="#ffffff" />
@@ -32,6 +36,6 @@ export function TokenTable() {
           </TableRow>
         </TableBody>
       </Table>
-    </>
+    </section>
   );
 }

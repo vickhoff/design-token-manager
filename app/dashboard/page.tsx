@@ -37,14 +37,15 @@ export default function Dashboard() {
 
   return (
     <div className="flex flex-col flex-1 items-center justify-center font-sans text-(--color-foreground-default)">
-      <main className="flex items-center justify-center flex-1 w-full max-w-7xl flex-col items-center py-32 px-16 sm:items-start">
-        {status === "loaded" && <TokenTable />}
+      <main className="flex items-center justify-center flex-1 w-full max-w-7xl flex-col py-32 px-16">
+        {status === "loaded" && <TokenTable type="Color" />}
         {status === "empty" && (
-          <Card className="max-w-xs">
+          <Card className="w-full max-w-md text-center">
             <CardHeader>
-              <CardTitle>Choose your file</CardTitle>
+              <CardTitle>Choose folder</CardTitle>
               <CardDescription>
-                Choose the file containing your tokens
+                Choose the folder containing your tokens. The file must be named
+                tokens.css or tokens.json
               </CardDescription>
             </CardHeader>
             <CardFooter className="flex-col gap-8>">
