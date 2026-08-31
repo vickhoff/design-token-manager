@@ -1,0 +1,13 @@
+:root {
+  --typography-body-family: "Inter", sans-serif;
+  --typography-body-size: 16px;
+  --typography-body-weight: normal;
+
+  --typography-nav-link-family: "Inter", sans-serif;
+  --typography-nav-link-size: 14px;
+  --typography-nav-link-weight: 600;
+
+  --typography-heading-family: "Georgia", serif;
+  --typography-heading-size: 32px;
+  --typography-heading-weight: bold;
+}
