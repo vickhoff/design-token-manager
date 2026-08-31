@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/card";
 import { TokenTable } from "./_components/TokenTable";
 
+import { parseCssTokens } from "@/lib/tokens/parseTokensCss";
+
 type Status = "empty" | "loading" | "loaded" | "error";
 
 export default function Dashboard() {
@@ -27,8 +29,11 @@ export default function Dashboard() {
     try {
       const root = await getFolder();
       const contents = await getFileContent(root);
+      const parsed = parseCssTokens(contents);
+
       setStatus("loaded");
-      console.log("loaded:", contents);
+      console.log("content:", contents);
+      console.log("parsed:", parsed);
     } catch (error) {
       console.log("falling back to defaults:", DEFAULT_TOKENS, error);
       setStatus("error");

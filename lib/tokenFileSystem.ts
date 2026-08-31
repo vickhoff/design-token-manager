@@ -16,10 +16,7 @@ export async function getFolder() {
 
 export async function getFileContent(root: FileSystemDirectoryHandle) {
   for await (const [name, handle] of root.entries()) {
-    if (
-      (name === "tokens.json" || name === "tokens.css") &&
-      handle.kind === "file"
-    ) {
+    if (name === "tokens.css" && handle.kind === "file") {
       const file = await handle.getFile();
       const contents = await file.text();
       return contents;
