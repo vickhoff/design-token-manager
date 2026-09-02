@@ -22,3 +22,9 @@ Headless run against all 4 fixtures confirmed:
 - **empty**: `{ tokens: [], warnings: [] }`, no crash.
 
 Not committed to a throwaway branch per the prototype skill's usual capture step — left as plain files in this directory instead, since committing wasn't requested. The map is now fully resolved (see map.md's Decisions so far / empty Not-yet-specified) — this was the last ticket.
+
+## Amendment (2026-09-01)
+
+**This prototype validated the original composite-typography design, which has since been revised** (see amendments on tickets 01/02/03/05). `prototype/parser.mjs` and its `fixtures/*.css` under this directory still reflect the old `-family`/`-size`/`-weight` merge convention — they're now a historical record of the design's first iteration, not current.
+
+The design actually got ported into the real app during implementation (`lib/tokens/types.ts` and `lib/tokens/parseTokensCss.ts`), which is where the typography redesign happened and was verified live (not re-captured as a separate throwaway prototype this time — it was a direct pairing session against the real module, checked with `tsc --noEmit` and a one-off `npx tsx` run rather than a dedicated fixture-driven prototype). Treat `lib/tokens/` as the current source of truth over this directory's `prototype/`.

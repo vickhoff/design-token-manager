@@ -23,3 +23,14 @@ What's left for this ticket: given a raw CSS value string and its **already-know
 - **`typography.size`**: reuses the dimension parser above verbatim.
 - **`typography.weight`** (`string | number` per the model): a purely numeric raw value (`"700"`) parses to JS `number`; a recognized CSS weight keyword (`normal`/`bold`/`bolder`/`lighter`) stays a `string`; anything else is invalid. No numeric range validation (not restricted to 100–900) — CSS itself doesn't hard-require that.
 - **Interface**: `parseValue(type, subField, rawValue)` returns the parsed value, or `null` on invalid input. No throwing, no result-object wrapper — this ticket's contract ends at "valid value in, parsed value or `null` out." All collecting/throwing/warning _strategy_ around a `null` belongs to the malformed-input ticket. Noted for later, not now: `null` could become a richer `{ reason }` shape if more descriptive errors are wanted down the line.
+
+## Amendment (2026-09-01)
+
+**Typography's `subField` parameter is gone**, following [Token/TokenGroup model shape](01-model-shape.md)'s amendment (no more composite value) and [Naming-convention grouping](02-naming-convention-grouping.md)'s amendment (no more reserved suffix). `parseValue` is now `parseValue(type: TokenType, rawValue: string)` — two parameters, not three. Since the naming convention no longer tells the parser which "kind" of typography value it's looking at, typography values are now classified **by shape**, tried in this order:
+
+1. Matches the dimension pattern (`<number><unit>`, same whitelist as `dimension`) → parsed as a `DimensionValue` (a size).
+2. Purely numeric (`"700"`) → parsed as a `number` (a weight).
+3. A recognized CSS weight keyword (`normal`/`bold`/`bolder`/`lighter`) → kept as a `string` (a weight).
+4. Otherwise, any non-empty string → kept as-is (a font family).
+
+**This reintroduces a real gap, worth naming plainly**: unlike `color`/`dimension`, typography's final fallback (step 4) accepts _anything_ non-empty — there's no shape a font-family value has to match, since font stacks are inherently free-form text. That means a garbage or unsupported value on a `typography`-typed property — including `var(--x)`, which correctly gets rejected for `color`/`dimension` — silently succeeds as if it were a valid family string instead of producing a warning. This is an accepted, permanent asymmetry of this design, not a bug: there's no way to validate "is this a plausible font stack" the way there's a way to validate "is this a plausible hex color."

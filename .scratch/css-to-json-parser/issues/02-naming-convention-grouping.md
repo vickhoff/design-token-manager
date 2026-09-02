@@ -28,3 +28,13 @@ Resolved this ticket in tandem with a foundational sub-decision: `TokenType` is 
    - Everything between `typography` and that reserved suffix gets the same subgroup/name split as color/dimension (1 segment → name only; 2+ → subgroup=first, name=rest joined).
    - Three declarations resolving to the same `type.subgroup.name` id merge into one `Token` with a `TypographyValue`. An incomplete triplet (1 or 2 of 3 present) is a malformed/edge case, not this ticket's concern — see the malformed-input ticket.
    - Examples: `--typography-heading-family` → subgroup=none, name=`heading`, sub-field=`family`. `--typography-nav-link-size` → subgroup=`nav`, name=`link`, sub-field=`size`.
+
+## Amendment (2026-09-01)
+
+**Step 4 above no longer applies — typography dropped its composite value in [Token/TokenGroup model shape](01-model-shape.md)'s amendment.** There's no more reserved suffix, no more assembly. Typography now follows **the exact same algorithm as step 3** (color/dimension) — one rule for all three types instead of two:
+
+- `--typography-sans` → 1 remaining segment → subgroup=none, name=`sans`
+- `--typography-size-lg` → 2 remaining segments → subgroup=`size`, name=`lg`
+- `--typography-weight` → 1 remaining segment → subgroup=none, name=`weight`
+
+Note that `size`/`weight`/`family`-ish words here are no longer structural keywords the algorithm looks for — they're just ordinary vocabulary the user happens to choose for subgroups/names, same as `brand`/`neutral` are for color. Nothing in the naming algorithm treats them specially anymore; the actual "is this a size or a weight or a family" question moved entirely into value parsing — see [Value parsing and validation](03-type-inference.md)'s amendment.

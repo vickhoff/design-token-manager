@@ -5,11 +5,9 @@ function isTokenType(value: string): value is TokenType {
   return (TOKEN_TYPES as readonly string[]).includes(value);
 }
 
-const TYPOGRAPHY_SUBFIELDS = ["family", "size", "weight"] as const;
-type TypographySubField = (typeof TYPOGRAPHY_SUBFIELDS)[number];
-
-function isTypographySubField(value: string): value is TypographySubField {
-  return (TYPOGRAPHY_SUBFIELDS as readonly string[]).includes(value);
+interface FileObject {
+  title: string;
+  content: string;
 }
 
 interface DimensionValue {
@@ -17,25 +15,12 @@ interface DimensionValue {
   unit: string;
 }
 
-interface TypographyValue {
-  fontFamily: string;
-  fontSize: DimensionValue;
-  fontWeight: string | number;
-}
-interface TypographyParts {
-  subgroup?: string;
-  name: string;
-  family?: string;
-  size?: DimensionValue;
-  weight?: string | number;
-}
-
 interface Token {
   id: string;
   type: TokenType;
   subgroup?: string;
   name: string;
-  value: string | DimensionValue | TypographyValue;
+  value: string | number | DimensionValue;
 }
 
 interface ParseWarning {
@@ -50,15 +35,11 @@ interface ParseResult {
 
 export {
   TOKEN_TYPES,
-  TYPOGRAPHY_SUBFIELDS,
-  isTypographySubField,
   isTokenType,
   type TokenType,
   type DimensionValue,
-  type TypographyValue,
-  type TypographyParts,
-  type TypographySubField,
   type Token,
   type ParseWarning,
   type ParseResult,
+  type FileObject,
 };

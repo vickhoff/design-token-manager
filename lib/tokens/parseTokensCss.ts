@@ -1,27 +1,20 @@
-// PROTOTYPE — pure parsing logic for the css-to-json-parser wayfinder map.
-// Implements the resolved design from tickets 01/02/03/05 in
-// .scratch/css-to-json-parser/issues/. Portable: no I/O, no console.log.
+// Parses a `tokens.css` file's `:root` custom properties into the flat
+// Token[] model described in types.ts. Hand-rolled — no CSS parsing library.
 //
-// Token shape (see 01-model-shape.md):
-//   { id, type: 'color'|'dimension'|'typography', subgroup?, name, value }
-//   value is: string (color) | { value, unit } (dimension) |
-//             { fontFamily, fontSize, fontWeight } (typography)
-//
-// parseCssTokens(cssText) -> { tokens: Token[], warnings: ParseWarning[] }
-// ParseWarning: { property: string, reason: string }
+// Naming convention: --<type>-[<subgroup>-]<name>, where <type> is
+// color/dimension/typography. Typography has no special suffix or
+// assembly step — it's a flat namespace exactly like color/dimension
+// (e.g. --typography-sans, --typography-size-lg, --typography-weight).
+// Since the name no longer signals which "kind" of typography value a
+// declaration holds, parseValue infers it from the value's own shape.
 
 import {
   isTokenType,
-  isTypographySubField,
-  TYPOGRAPHY_SUBFIELDS,
   type TokenType,
-  type TypographySubField,
   type DimensionValue,
-  type TypographyValue,
   type Token,
   type ParseWarning,
   type ParseResult,
-  type TypographyParts,
 } from "./types";
 
 const DIMENSION_UNITS = new Set(["px", "rem", "em", "%"]);
@@ -31,17 +24,10 @@ const COLOR_RE =
 const DIMENSION_RE = /^(-?\d*\.?\d+)(px|rem|em|%)$/;
 const WEIGHT_KEYWORDS = new Set(["normal", "bold", "bolder", "lighter"]);
 
-// --- 02: naming-convention grouping ---------------------------------------
+// --- naming-convention grouping ---------------------------------------
 
 type NameSplit =
-  | { error: string }
-  | {
-      type: "typography";
-      subgroup?: string;
-      name: string;
-      subField: TypographySubField;
-    }
-  | { type: "color" | "dimension"; subgroup?: string; name: string };
+  { error: string } | { type: TokenType; subgroup?: string; name: string };
 
 function splitPropertyName(rawProperty: string): NameSplit {
   // rawProperty includes the leading "--"
@@ -55,31 +41,6 @@ function splitPropertyName(rawProperty: string): NameSplit {
   }
   // past this point, TS knows `type` is `TokenType`, not just `string`
 
-  if (type === "typography") {
-    if (rest.length === 0) {
-      return {
-        error: "typography property missing name and family/size/weight suffix",
-      };
-    }
-    const subField = rest[rest.length - 1];
-    if (!isTypographySubField(subField)) {
-      return {
-        error: `typography property must end in family/size/weight, got "${subField}"`,
-      };
-    }
-    // past this point, TS knows `subField` is `TypographySubField`, not just `string`
-    const nameSegments = rest.slice(0, -1);
-    if (nameSegments.length === 0) {
-      return {
-        error:
-          "typography property missing name before the family/size/weight suffix",
-      };
-    }
-    const [subgroup, name] = splitSubgroupAndName(nameSegments);
-    return { type, subgroup, name, subField };
-  }
-
-  // color / dimension
   if (rest.length === 0) {
     return { error: `${type} property missing a name segment` };
   }
@@ -103,11 +64,18 @@ function tokenId(
   return subgroup ? `${type}.${subgroup}.${name}` : `${type}.${name}`;
 }
 
-// --- 03: value parsing and validation ---------------------------------------
+// --- value parsing and validation ---------------------------------------
+
+function parseDimension(value: string): DimensionValue | null {
+  const match = DIMENSION_RE.exec(value);
+  if (!match) return null;
+  const [, num, unit] = match;
+  if (!DIMENSION_UNITS.has(unit)) return null;
+  return { value: Number(num), unit };
+}
 
 function parseValue(
   type: TokenType,
-  subField: TypographySubField | undefined,
   rawValue: string,
 ): string | number | DimensionValue | null {
   const value = rawValue.trim();
@@ -116,28 +84,26 @@ function parseValue(
     return COLOR_RE.test(value) ? value : null;
   }
 
-  if (type === "dimension" || subField === "size") {
-    const match = DIMENSION_RE.exec(value);
-    if (!match) return null;
-    const [, num, unit] = match;
-    if (!DIMENSION_UNITS.has(unit)) return null;
-    return { value: Number(num), unit };
+  if (type === "dimension") {
+    return parseDimension(value);
   }
 
-  if (subField === "family") {
-    return value.length > 0 ? value : null;
-  }
+  // typography: no naming signal for which "kind" of value this is, so
+  // infer from shape — dimension-shaped -> size, numeric/keyword -> weight,
+  // otherwise treat as a font-family string (which is why var(--x) and
+  // other garbage silently pass through as "family" here, unlike color/
+  // dimension — font-family values are inherently free-form, so there's
+  // no shape check to reject against).
+  const dimension = parseDimension(value);
+  if (dimension !== null) return dimension;
 
-  if (subField === "weight") {
-    if (/^\d+$/.test(value)) return Number(value);
-    if (WEIGHT_KEYWORDS.has(value)) return value;
-    return null;
-  }
+  if (/^\d+$/.test(value)) return Number(value);
+  if (WEIGHT_KEYWORDS.has(value)) return value;
 
-  return null;
+  return value.length > 0 ? value : null;
 }
 
-// --- 05: overall skip-and-collect pipeline ----------------------------------
+// --- overall skip-and-collect pipeline ----------------------------------
 
 function extractRootDeclarations(cssText: string): string[] {
   const noComments = cssText.replace(/\/\*[\s\S]*?\*\//g, "");
@@ -172,8 +138,7 @@ export function parseCssTokens(cssText: string): ParseResult {
     byProperty.set(property, rawValue);
   }
 
-  const scalarTokens: Token[] = [];
-  const typographyParts = new Map<string, TypographyParts>();
+  const tokens: Token[] = [];
 
   for (const [property, rawValue] of byProperty) {
     const split = splitPropertyName(property);
@@ -182,34 +147,8 @@ export function parseCssTokens(cssText: string): ParseResult {
       continue;
     }
 
-    if (split.type === "typography") {
-      const { subgroup, name, subField } = split;
-      const parsed = parseValue("typography", subField, rawValue);
-      if (parsed === null) {
-        warnings.push({
-          property,
-          reason: `invalid ${subField} value "${rawValue}"`,
-        });
-        continue;
-      }
-      const id = tokenId("typography", subgroup, name);
-      const entry = typographyParts.get(id) ?? { subgroup, name };
-      // Assigned per-field (not `entry[subField] = parsed`) because writing
-      // through a union of keys forces TS to demand the value satisfy every
-      // possible field's type at once — see the parseValue return type above.
-      if (subField === "family") {
-        entry.family = parsed as string;
-      } else if (subField === "size") {
-        entry.size = parsed as DimensionValue;
-      } else {
-        entry.weight = parsed as string | number;
-      }
-      typographyParts.set(id, entry);
-      continue;
-    }
-
     const { type, subgroup, name } = split;
-    const parsed = parseValue(type, undefined, rawValue);
+    const parsed = parseValue(type, rawValue);
     if (parsed === null) {
       warnings.push({
         property,
@@ -217,39 +156,15 @@ export function parseCssTokens(cssText: string): ParseResult {
       });
       continue;
     }
-    scalarTokens.push({
+
+    tokens.push({
       id: tokenId(type, subgroup, name),
       type,
       subgroup,
       name,
-      // `type` here is "color" | "dimension", so parseValue can only have
-      // returned a string or a DimensionValue — never the `number` branch
-      // (that's only reachable for typography's `weight` subField).
-      value: parsed as string | DimensionValue,
+      value: parsed,
     });
   }
 
-  const typographyTokens: Token[] = [];
-  for (const [id, entry] of typographyParts) {
-    const { subgroup, name, family, size, weight } = entry;
-    if (family === undefined || size === undefined || weight === undefined) {
-      const missing = TYPOGRAPHY_SUBFIELDS.filter(
-        (f) => entry[f] === undefined,
-      );
-      warnings.push({
-        property: id,
-        reason: `incomplete typography token — missing ${missing.join(", ")}`,
-      });
-      continue;
-    }
-    typographyTokens.push({
-      id,
-      type: "typography",
-      subgroup,
-      name,
-      value: { fontFamily: family, fontSize: size, fontWeight: weight },
-    });
-  }
-
-  return { tokens: [...scalarTokens, ...typographyTokens], warnings };
+  return { tokens, warnings };
 }

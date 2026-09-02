@@ -6,6 +6,7 @@ import {
   getFolder,
   getFileContent,
   DEFAULT_TOKENS,
+  loadTokenFile,
 } from "@/lib/tokenFileSystem";
 import {
   Card,
@@ -17,33 +18,43 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { TokenTable } from "./_components/TokenTable";
-
-import { parseCssTokens } from "@/lib/tokens/parseTokensCss";
+import { type FileObject } from "@/lib/tokens/types";
+import { type ParseResult } from "@/lib/tokens/types";
 
 type Status = "empty" | "loading" | "loaded" | "error";
 
 export default function Dashboard() {
   const [status, setStatus] = useState<Status>("empty");
+  const [rawFile, setRawFile] = useState<FileObject | null>(null);
+  const [jsonFile, setJsonFile] = useState<ParseResult | null>(null);
 
   async function handleChooseFolder() {
     try {
-      const root = await getFolder();
-      const contents = await getFileContent(root);
-      const parsed = parseCssTokens(contents);
-
+      const { rawFile, jsonFile } = await loadTokenFile();
+      setRawFile(rawFile);
+      setJsonFile(jsonFile);
       setStatus("loaded");
-      console.log("content:", contents);
-      console.log("parsed:", parsed);
     } catch (error) {
       console.log("falling back to defaults:", DEFAULT_TOKENS, error);
       setStatus("error");
     }
   }
 
+  const grouped =
+    status === "loaded"
+      ? Object.groupBy(jsonFile?.tokens ?? [], (token) => token.type)
+      : {};
+
   return (
     <div className="flex flex-col flex-1 items-center justify-center font-sans text-(--color-foreground-default)">
       <main className="flex items-center justify-center flex-1 w-full max-w-7xl flex-col py-32 px-16">
-        {status === "loaded" && <TokenTable type="Color" />}
+        {status === "loaded" && (
+          <section className=" flex flex-col gap-6 w-full">
+            {Object.entries(grouped).map(([type, tokens]) => (
+              <TokenTable key={type} type={type} tokens={tokens} />
+            ))}
+          </section>
+        )}
         {status === "empty" && (
           <Card className="w-full max-w-md text-center">
             <CardHeader>

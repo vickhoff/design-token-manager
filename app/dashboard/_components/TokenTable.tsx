@@ -9,15 +9,18 @@ import {
   TableCaption,
 } from "@/components/ui/table";
 import { TableInput } from "./TableInput";
+import { type Token } from "../../../lib/tokens/types";
+import { firstLetterUpperCase } from "../../../lib/utils";
 
 interface TokenTableProps {
   type: string;
+  tokens: Token[];
 }
 
-export function TokenTable({ type }: TokenTableProps) {
+export function TokenTable({ type, tokens }: TokenTableProps) {
   return (
-    <section className="bg-(--color-surface-default) border border-(--color-border-default) rounded p-4">
-      <h2>{type}</h2>
+    <section className="bg-(--color-surface-default) border border-(--color-border-default) rounded-(--radius-xl) p-4 w-full">
+      <h2>{firstLetterUpperCase(type)}</h2>
       <Table>
         <TableHeader>
           <TableRow>

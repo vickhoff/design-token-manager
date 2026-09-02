@@ -32,3 +32,10 @@ Per-scenario behavior:
 - **Incomplete typography triplet** (1 or 2 of 3 sub-declarations present): dropped with a warning — can't form a valid `TypographyValue` with a missing field, and the model doesn't allow partial/undefined fields.
 - **CSS comments**: stripped during parsing, not warning-worthy.
 - **Empty `tokens.css`** (file exists, zero custom properties): not an error — returns `{ tokens: [], warnings: [] }`. Whether the app tells the user "no tokens found" is a UI decision, out of this parser's concern.
+
+## Amendment (2026-09-01)
+
+Following the typography redesign (see amendments on [Token/TokenGroup model shape](01-model-shape.md), [Naming-convention grouping](02-naming-convention-grouping.md), and [Value parsing and validation](03-type-inference.md)):
+
+- **"Incomplete typography triplet" no longer exists as a scenario.** There's no more assembly step, so there's nothing to be incomplete — each typography declaration is now an independent token, same as color/dimension. Remove this from the mental model of malformed scenarios.
+- **A new, permanent asymmetry replaces it**: `var(--x)`'s "no special-casing needed" claim above (line 31) now only holds for `color`/`dimension`. For `typography`, a `var()` value — or any other value that doesn't look like a dimension or a weight — silently succeeds as a font-family string instead of producing a warning, per [Value parsing and validation](03-type-inference.md)'s amendment. This was a deliberate tradeoff accepted during that ticket's revision, not an oversight here.
