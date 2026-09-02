@@ -2,12 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  getFolder,
-  getFileContent,
-  DEFAULT_TOKENS,
-  loadTokenFile,
-} from "@/lib/tokenFileSystem";
+import { DEFAULT_TOKENS, loadTokenFile } from "@/lib/tokenFileSystem";
 import {
   Card,
   CardAction,
@@ -18,44 +13,54 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { TokenTable } from "./_components/TokenTable";
-import { type FileObject } from "@/lib/tokens/types";
 import { type ParseResult } from "@/lib/tokens/types";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import {
+  setTokenFile,
+  clearTokenFile,
+} from "@/lib/state/features/tokenFile/tokenFileSlice";
 
-type Status = "empty" | "loading" | "loaded" | "error";
+type Status = "empty" | "loading" | "error";
 
 export default function Dashboard() {
+  const rawFile = useAppSelector((state) => state.tokenFile.rawFile);
+  const jsonFile = useAppSelector((state) => state.tokenFile.jsonFile);
+  const isLoaded = jsonFile !== null;
   const [status, setStatus] = useState<Status>("empty");
-  const [rawFile, setRawFile] = useState<FileObject | null>(null);
-  const [jsonFile, setJsonFile] = useState<ParseResult | null>(null);
+  const dispatch = useAppDispatch();
 
   async function handleChooseFolder() {
     try {
       const { rawFile, jsonFile } = await loadTokenFile();
-      setRawFile(rawFile);
-      setJsonFile(jsonFile);
-      setStatus("loaded");
+      dispatch(setTokenFile({ rawFile, jsonFile }));
     } catch (error) {
       console.log("falling back to defaults:", DEFAULT_TOKENS, error);
       setStatus("error");
     }
   }
 
-  const grouped =
-    status === "loaded"
-      ? Object.groupBy(jsonFile?.tokens ?? [], (token) => token.type)
-      : {};
+  function handleReset() {
+    dispatch(clearTokenFile());
+  }
+
+  const grouped = isLoaded
+    ? Object.groupBy(jsonFile?.tokens ?? [], (token) => token.type)
+    : {};
 
   return (
     <div className="flex flex-col flex-1 items-center justify-center font-sans text-(--color-foreground-default)">
       <main className="flex items-center justify-center flex-1 w-full max-w-7xl flex-col py-32 px-16">
-        {status === "loaded" && (
-          <section className=" flex flex-col gap-6 w-full">
-            {Object.entries(grouped).map(([type, tokens]) => (
-              <TokenTable key={type} type={type} tokens={tokens} />
-            ))}
-          </section>
+        {isLoaded && (
+          <>
+            <Button onClick={handleReset}>Change folder</Button>
+            <section className=" flex flex-col gap-6 w-full">
+              {Object.entries(grouped).map(([type, tokens]) => (
+                <TokenTable key={type} type={type} tokens={tokens} />
+              ))}
+            </section>
+          </>
         )}
-        {status === "empty" && (
+        {!isLoaded && status === "empty" && (
           <Card className="w-full max-w-md text-center">
             <CardHeader>
               <CardTitle>Choose folder</CardTitle>
