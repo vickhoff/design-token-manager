@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
-import { Figtree, Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-const figtree = Figtree({
-  variable: "--font-sans",
-  subsets: ["latin"],
-});
+import { Provider } from "react-redux";
+import { store } from "./state/store";
 
 const geist = Geist({
   variable: "--font-sans",
