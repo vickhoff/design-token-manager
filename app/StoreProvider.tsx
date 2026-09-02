@@ -1,8 +1,10 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { Provider } from "react-redux";
 import { makeStore, AppStore } from "../lib/state/store";
+import { loadTokenFileState } from "@/lib/state/persistTokenFile";
+import { setTokenFile } from "../lib/state/features/tokenFile/tokenFileSlice";
 
 export default function StoreProvider({
   children,
@@ -14,5 +16,13 @@ export default function StoreProvider({
     // Create the store instance the first time this renders
     storeRef.current = makeStore();
   }
+
+  useEffect(() => {
+    const persisted = loadTokenFileState();
+    if (persisted) {
+      storeRef.current!.dispatch(setTokenFile(persisted));
+    }
+  }, []);
+
   return <Provider store={storeRef.current}>{children}</Provider>;
 }

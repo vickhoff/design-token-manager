@@ -1,16 +1,21 @@
 import { configureStore } from "@reduxjs/toolkit";
 import tokenFileReducer from "./features/tokenFile/tokenFileSlice";
-import { loadTokenFileState } from "./persistTokenFile";
+import { saveTokenFileState } from "./persistTokenFile";
 
 export const makeStore = () => {
-  return configureStore({
+  const store = configureStore({
     reducer: {
       tokenFile: tokenFileReducer,
     },
-    preloadedState: {
-      tokenFile: loadTokenFileState() ?? { rawFile: null, jsonFile: null },
-    },
   });
+
+  if (typeof window !== "undefined") {
+    store.subscribe(() => {
+      saveTokenFileState(store.getState().tokenFile);
+    });
+  }
+
+  return store;
 };
 
 export type AppStore = ReturnType<typeof makeStore>;
