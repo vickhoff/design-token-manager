@@ -157,6 +157,8 @@ export function parseCssTokens(cssText: string): ParseResult {
       continue;
     }
 
+    const fullName = `${type}.${!subgroup ? "" : subgroup + "."}${name}`;
+
     tokens.push({
       id: tokenId(type, subgroup, name),
       type,

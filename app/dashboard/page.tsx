@@ -1,5 +1,5 @@
 "use client";
-
+import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { DEFAULT_TOKENS, loadTokenFile } from "@/lib/tokenFileSystem";
@@ -47,14 +47,22 @@ export default function Dashboard() {
     ? Object.groupBy(jsonFile?.tokens ?? [], (token) => token.type)
     : {};
 
+  const sortedGrouped = Object.fromEntries(
+    Object.entries(grouped).map(([type, tokens]) => [
+      type,
+      tokens?.toSorted((a, b) => a.id.localeCompare(b.id)) ?? [],
+    ]),
+  );
+
   return (
     <div className="flex flex-col flex-1 items-center justify-center font-sans text-(--color-foreground-default)">
-      <main className="flex items-center justify-center flex-1 w-full max-w-7xl flex-col py-32 px-16">
+      <Link href="/">Back to home</Link>
+      <main className="flex items-center justify-center flex-1 w-full max-w-7xl flex-col py-32 px-">
         {isLoaded && (
           <>
             <Button onClick={handleReset}>Change folder</Button>
             <section className=" flex flex-col gap-6 w-full">
-              {Object.entries(grouped).map(([type, tokens]) => (
+              {Object.entries(sortedGrouped).map(([type, tokens]) => (
                 <TokenTable key={type} type={type} tokens={tokens} />
               ))}
             </section>
