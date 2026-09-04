@@ -39,7 +39,7 @@ function renderIcon(type: string) {
 
 export function TokenTable({ type, tokens }: TokenTableProps) {
   return (
-    <section className="bg-(--color-surface-default) border border-(--color-border-default) rounded-(--radius-xl) p-4 w-full">
+    <section className="bg-surface-default border border-border-default rounded-(--radius-xl) p-4 w-full">
       <h2>{firstLetterUpperCase(type)}</h2>
       <Table className="table-fixed">
         <TableHeader>
@@ -61,7 +61,7 @@ export function TokenTable({ type, tokens }: TokenTableProps) {
                 <span className="flex items-center gap-1.5">
                   {token.type === "color" ? (
                     <div
-                      className="w-4 h-4 rounded-sm border border-(--color-border-default)"
+                      className="w-4 h-4 rounded-sm border border-border-default"
                       style={{ backgroundColor: token.value as string }}
                     />
                   ) : null}

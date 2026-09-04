@@ -8,7 +8,7 @@ export function TableInput({
   return (
     <Input
       className={cn(
-        " font-mono h-6 px-1.5 py-0.5 border-transparent hover:border hover:border-(--color-border-default)",
+        " font-mono h-6 px-1.5 py-0.5 border-transparent hover:border hover:border-border-default",
         className,
       )}
       {...props}

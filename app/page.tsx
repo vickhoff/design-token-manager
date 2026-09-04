@@ -19,7 +19,7 @@ const tokenChips = tokenChipsHome.map((chip) => (
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center font-sans text-(--color-foreground-default) bg-[radial-gradient(circle,#00000022_1px,transparent_1px)] [background-size:12px_12px]">
+    <div className="flex flex-col flex-1 items-center justify-center font-sans text-foreground-default bg-[radial-gradient(circle,#00000022_1px,transparent_1px)] dark:bg-[radial-gradient(circle,#ffffff22_1px,transparent_1px)] [background-size:12px_12px]">
       <main className="flex items-center justify-center flex-1 w-full max-w-7xl flex-col items-center py-32 px-16 sm:items-start">
         <section className="items-center text-center px-48 flex flex-col gap-6">
           <div className="flex flex-col gap-2">
