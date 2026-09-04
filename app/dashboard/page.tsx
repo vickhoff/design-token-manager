@@ -38,7 +38,7 @@ export default function Dashboard() {
       setStatus("error");
     }
   }
-
+  console.log("jsonFile", jsonFile);
   function handleReset() {
     dispatch(clearTokenFile());
   }
