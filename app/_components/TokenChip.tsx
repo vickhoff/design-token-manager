@@ -6,9 +6,9 @@ interface TokenChipProps {
 
 function TokenChip({ label, type, value }: TokenChipProps) {
   return (
-    <div className="flex items-center gap-2 p-1 border rounded-md border-(--color-border-default) font-mono text-xs bg-(--color-surface-default)">
+    <div className="flex items-center gap-2 p-1 border rounded-md border-border-default font-mono text-xs bg-surface-default">
       <div
-        className={`flex items-center justify-center border-(--color-border-default) text-(--color-foreground-subtle) h-5 w-5 rounded-sm ${type === "color" ? "border" : "bg-(--color-surface-subtler)"}`}
+        className={`flex items-center justify-center border-border-default text-foreground-subtle h-5 w-5 rounded-sm ${type === "color" ? "border" : "bg-surface-subtler"}`}
         style={type === "color" ? { backgroundColor: value } : undefined}
       >
         {type === "font" && <span className="text-xs font-medium">Ag</span>}

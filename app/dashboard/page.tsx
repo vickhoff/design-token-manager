@@ -55,7 +55,7 @@ export default function Dashboard() {
   );
 
   return (
-    <div className="flex flex-col flex-1 items-center justify-center font-sans text-(--color-foreground-default)">
+    <div className="flex flex-col flex-1 items-center justify-center font-sans text-foreground-default">
       <Link href="/">Back to home</Link>
       <main className="flex items-center justify-center flex-1 w-full max-w-7xl flex-col py-32 px-6">
         {isLoaded && (
