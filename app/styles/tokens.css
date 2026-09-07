@@ -27,15 +27,15 @@
   --color-border-default-hover: light-dark(#c3bcbc, #3f4e68);
   --color-border-on-dark: light-dark(#273347, #273347);
 
-  --spacing-2xs: 4px;
-  --spacing-xs: 8px;
-  --spacing-sm: 12px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
-  --spacing-xl: 32px;
-  --spacing-2xl: 40px;
-  --spacing-3xl: 56px;
-  --spacing-4xl: 80px;
-  --spacing-5xl: 120px;
-  --spacing-6xl: 160px;
+  --spacing-space-2xs: 4px;
+  --spacing-space-xs: 8px;
+  --spacing-space-sm: 12px;
+  --spacing-space-md: 16px;
+  --spacing-space-lg: 24px;
+  --spacing-space-xl: 32px;
+  --spacing-space-2xl: 40px;
+  --spacing-space-3xl: 56px;
+  --spacing-space-4xl: 80px;
+  --spacing-space-5xl: 120px;
+  --spacing-space-6xl: 160px;
 }

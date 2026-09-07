@@ -77,7 +77,7 @@ export default function Dashboard() {
                 tokens.css or tokens.json
               </CardDescription>
             </CardHeader>
-            <CardFooter className="flex-col gap-8>">
+            <CardFooter className="flex-col gap-2">
               <Button className="w-full" onClick={handleChooseFolder}>
                 Choose folder
               </Button>
