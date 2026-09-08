@@ -1,5 +1,4 @@
 "use client";
-import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { DEFAULT_TOKENS, loadTokenFile } from "@/lib/tokenFileSystem";
@@ -37,13 +36,11 @@ export default function Dashboard() {
     try {
       const { rawFile, jsonFile } = await loadTokenFile();
       dispatch(setTokenFile({ rawFile, jsonFile }));
-      console.log("jsonFile", jsonFile);
     } catch (error) {
       console.log("falling back to defaults:", DEFAULT_TOKENS, error);
       setStatus("error");
     }
   }
-  console.log("jsonFile", jsonFile);
   function handleReset() {
     dispatch(clearTokenFile());
   }
@@ -64,20 +61,19 @@ export default function Dashboard() {
       <main className="flex items-center justify-center flex-1 w-full max-w-7xl flex-col py-32 px-6">
         {isLoaded && (
           <>
-            {hasWarnings && (
-              <Alert variant="warning" className="max-w-md">
-                <TriangleAlert />
-                <AlertTitle>
-                  {jsonFile.warnings.length} of your tokens couldnt be
-                  identified
-                </AlertTitle>
-                <AlertDescription>
-                  Scroll down to see the unidentified tokens.
-                </AlertDescription>
-              </Alert>
-            )}
-            <Button onClick={handleReset}>Change folder</Button>
             <section className=" flex flex-col gap-6 w-full">
+              {hasWarnings && (
+                <Alert variant="warning" className="max-w-md self-center">
+                  <TriangleAlert />
+                  <AlertTitle>
+                    {jsonFile.warnings.length} of your tokens couldnt be
+                    identified
+                  </AlertTitle>
+                  <AlertDescription className="text-foreground-on-warning">
+                    Scroll down to see the unidentified tokens.
+                  </AlertDescription>
+                </Alert>
+              )}
               {Object.entries(sortedGrouped).map(([type, tokens]) => (
                 <TokenTable key={type} type={type} tokens={tokens} />
               ))}
