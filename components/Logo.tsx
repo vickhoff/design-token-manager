@@ -2,7 +2,7 @@ import LogoSymbol from "@/public/jadtm-logo.svg";
 import { cn } from "@/lib/utils";
 
 interface LogoProps {
-  className: string;
+  className?: string;
 }
 
 export default function Logo({ className }: LogoProps) {
