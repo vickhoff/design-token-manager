@@ -1,20 +1,21 @@
 "use client";
-import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { DEFAULT_TOKENS, loadTokenFile } from "@/lib/tokenFileSystem";
+
 import {
   Card,
-  CardAction,
-  CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { TriangleAlert } from "lucide-react";
 import { TokenTable } from "./_components/TokenTable";
-import { type ParseResult } from "@/lib/tokens/types";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+
 import {
   setTokenFile,
   clearTokenFile,
@@ -25,7 +26,9 @@ type Status = "empty" | "loading" | "error";
 export default function Dashboard() {
   const rawFile = useAppSelector((state) => state.tokenFile.rawFile);
   const jsonFile = useAppSelector((state) => state.tokenFile.jsonFile);
+
   const isLoaded = jsonFile !== null;
+  const hasWarnings = jsonFile !== null && jsonFile.warnings.length > 0;
   const [status, setStatus] = useState<Status>("empty");
   const dispatch = useAppDispatch();
 
@@ -38,7 +41,6 @@ export default function Dashboard() {
       setStatus("error");
     }
   }
-  console.log("jsonFile", jsonFile);
   function handleReset() {
     dispatch(clearTokenFile());
   }
@@ -56,12 +58,22 @@ export default function Dashboard() {
 
   return (
     <div className="flex flex-col flex-1 items-center justify-center font-sans text-foreground-default">
-      <Link href="/">Back to home</Link>
       <main className="flex items-center justify-center flex-1 w-full max-w-7xl flex-col py-32 px-6">
         {isLoaded && (
           <>
-            <Button onClick={handleReset}>Change folder</Button>
             <section className=" flex flex-col gap-6 w-full">
+              {hasWarnings && (
+                <Alert variant="warning" className="max-w-md self-center">
+                  <TriangleAlert />
+                  <AlertTitle>
+                    {jsonFile.warnings.length} of your tokens couldnt be
+                    identified
+                  </AlertTitle>
+                  <AlertDescription className="text-foreground-on-warning">
+                    Scroll down to see the unidentified tokens.
+                  </AlertDescription>
+                </Alert>
+              )}
               {Object.entries(sortedGrouped).map(([type, tokens]) => (
                 <TokenTable key={type} type={type} tokens={tokens} />
               ))}
