@@ -24,8 +24,6 @@ export async function getFileContent(root: FileSystemDirectoryHandle) {
       const content = await file.text();
       const title = file.name;
 
-      console.log("content", content);
-
       if (content.trim().length === 0) {
         throw new Error("The file is empty");
       }

@@ -11,8 +11,8 @@
 }
 
 @theme {
-  --color-body: light-dark(#fbfbfb, #131313);
-  --color-surface-default: light-dark(#ffffff, #0a0a0a);
+  --color-body: light-dark(#fbfbfb, #191919);
+  --color-surface-default: light-dark(#ffffff, #0f0f0f);
   --color-surface-warning: light-dark(#fef3c7, #ca8a04);
   --color-surface-accent: light-dark(#4ade80, #4ade80);
   --color-surface-primary: light-dark(#0a0a0a, #ffffff);
