@@ -156,10 +156,10 @@ function parseCssTokens(cssText: string): ParseResult {
 
     const { type, subgroup, name } = split;
     const parsed = parseValue(type, rawValue);
-    if (parsed === null) {
+    if (!parsed.ok) {
       warnings.push({
         property,
-        reason: `invalid ${type} value "${rawValue}"`,
+        reason: parsed.reason,
       });
       continue;
     }
@@ -169,7 +169,7 @@ function parseCssTokens(cssText: string): ParseResult {
       type,
       subgroup,
       name,
-      value: parsed,
+      value: parsed.value,
     });
   }
 
