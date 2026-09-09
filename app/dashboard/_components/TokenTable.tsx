@@ -8,9 +8,12 @@ import {
   TableCell,
   TableCaption,
 } from "@/components/ui/table";
+import { Field } from "@/components/ui/field";
 import { type Token } from "../../../lib/tokens/types";
 import { firstLetterUpperCase } from "../../../lib/utils";
 import { Palette, Type, SquareDashed, CircleQuestionMark } from "lucide-react";
+import { TableInput } from "./TableInput";
+import { parseValue } from "@/lib/tokens/parseTokensCss";
 
 interface TokenTableProps {
   type: string;
@@ -51,31 +54,46 @@ export function TokenTable({ type, tokens }: TokenTableProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {tokens.map((token) => (
-            <TableRow className="font-mono" key={token.id}>
-              <TableCell>
-                <span className="flex items-center gap-1.5">
-                  {renderIcon(token.type as string)}
-                  <code>{token.id}</code>
-                </span>
-              </TableCell>
-              <TableCell>
-                <span className="flex items-center gap-1.5">
-                  {token.type === "color" ? (
-                    <div
-                      className="w-4 h-4 rounded-sm border border-border-default"
-                      style={{ backgroundColor: token.value as string }}
-                    />
-                  ) : null}
-                  <code>
-                    {typeof token.value === "object"
-                      ? `${token.value.value}${token.value.unit}`
-                      : token.value}
-                  </code>
-                </span>
-              </TableCell>
-            </TableRow>
-          ))}
+          {tokens.map((token) => {
+            const displayValue =
+              typeof token.value === "object"
+                ? `${token.value.value}${token.value.unit}`
+                : String(token.value);
+            return (
+              <TableRow className="font-mono" key={token.id}>
+                <TableCell>
+                  <span className="flex items-center gap-1.5">
+                    {renderIcon(token.type as string)}
+                    <code>{token.id}</code>
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <span className="flex items-center gap-1.5">
+                    {token.type === "color" ? (
+                      <div
+                        className="w-4 h-4 rounded-sm border border-border-default"
+                        style={{ backgroundColor: token.value as string }}
+                      />
+                    ) : null}
+                    <Field>
+                      <TableInput
+                        defaultValue={displayValue}
+                        onBlur={(e) => {
+                          const result = parseValue(token.type, e.target.value);
+                          if (!result.ok) {
+                            e.target.value = displayValue;
+                            console.log(result.reason);
+                          } else {
+                            console.log(result.value);
+                          }
+                        }}
+                      />
+                    </Field>
+                  </span>
+                </TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </section>
