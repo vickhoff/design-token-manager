@@ -40,7 +40,9 @@ function renderIcon(type: string) {
 export function TokenTable({ type, tokens }: TokenTableProps) {
   return (
     <section className="bg-surface-default border border-border-default rounded-(--radius-xl) p-4 w-full">
-      <h2>{firstLetterUpperCase(type)}</h2>
+      <h2 className="font-medium">
+        {firstLetterUpperCase(type)} ({tokens.length})
+      </h2>
       <Table className="table-fixed">
         <TableHeader>
           <TableRow>

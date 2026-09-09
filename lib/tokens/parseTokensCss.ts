@@ -116,7 +116,7 @@ function extractRootDeclarations(cssText: string): string[] {
     .filter(Boolean);
 }
 
-export function parseCssTokens(cssText: string): ParseResult {
+function parseCssTokens(cssText: string): ParseResult {
   const warnings: ParseWarning[] = [];
   const declarations = extractRootDeclarations(cssText);
 
@@ -170,3 +170,5 @@ export function parseCssTokens(cssText: string): ParseResult {
 
   return { tokens, warnings };
 }
+
+export { parseValue, parseDimension, parseCssTokens };
