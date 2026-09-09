@@ -15,6 +15,7 @@ import {
   type Token,
   type ParseWarning,
   type ParseResult,
+  type ParsedValue,
 } from "./types";
 
 const DIMENSION_UNITS = new Set(["px", "rem", "em", "%"]);
@@ -74,18 +75,21 @@ function parseDimension(value: string): DimensionValue | null {
   return { value: Number(num), unit };
 }
 
-function parseValue(
-  type: TokenType,
-  rawValue: string,
-): string | number | DimensionValue | null {
+function parseValue(type: TokenType, rawValue: string): ParsedValue {
   const value = rawValue.trim();
 
   if (type === "color") {
-    return COLOR_RE.test(value) ? value : null;
+    return COLOR_RE.test(value)
+      ? { ok: true, value }
+      : { ok: false, reason: "Invalid color value" };
   }
 
   if (type === "dimension") {
-    return parseDimension(value);
+    const dimension = parseDimension(value);
+    if (dimension === null) {
+      return { ok: false, reason: "Invalid dimension value" };
+    }
+    return { ok: true, value: dimension };
   }
 
   // typography: no naming signal for which "kind" of value this is, so
@@ -95,12 +99,15 @@ function parseValue(
   // dimension — font-family values are inherently free-form, so there's
   // no shape check to reject against).
   const dimension = parseDimension(value);
-  if (dimension !== null) return dimension;
+  if (dimension !== null) return { ok: true, value: dimension };
 
-  if (/^\d+$/.test(value)) return Number(value);
-  if (WEIGHT_KEYWORDS.has(value)) return value;
+  if (/^\d+$/.test(value)) return { ok: true, value: Number(value) };
+  if (WEIGHT_KEYWORDS.has(value)) return { ok: true, value };
 
-  return value.length > 0 ? value : null;
+  if (value.length === 0) {
+    return { ok: false, reason: "Invalid typography value" };
+  }
+  return { ok: true, value };
 }
 
 // --- overall skip-and-collect pipeline ----------------------------------
@@ -156,8 +163,6 @@ function parseCssTokens(cssText: string): ParseResult {
       });
       continue;
     }
-
-    const fullName = `${type}.${!subgroup ? "" : subgroup + "."}${name}`;
 
     tokens.push({
       id: tokenId(type, subgroup, name),
