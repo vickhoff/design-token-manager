@@ -43,6 +43,7 @@ function renderIcon(type: string) {
 
 export function TokenTable({ type, tokens }: TokenTableProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [colorValues, setColorValues] = useState<Record<string, string>>({});
 
   return (
     <section className="bg-surface-default border border-border-default rounded-(--radius-xl) p-4 w-full">
@@ -58,13 +59,14 @@ export function TokenTable({ type, tokens }: TokenTableProps) {
         </TableHeader>
         <TableBody>
           {tokens.map((token) => {
+            const inputVariant = token.type === "color" ? "color" : "default";
             const displayValue =
               typeof token.value === "object"
                 ? `${token.value.value}${token.value.unit}`
                 : String(token.value);
             return (
-              <TableRow className="font-mono" key={token.id}>
-                <TableCell>
+              <TableRow className="font-mono min-h-[64]" key={token.id}>
+                <TableCell className="min-h-[64]">
                   <span className="flex items-center gap-1.5">
                     {renderIcon(token.type as string)}
                     <code>{token.id}</code>
@@ -72,14 +74,14 @@ export function TokenTable({ type, tokens }: TokenTableProps) {
                 </TableCell>
                 <TableCell>
                   <span className="flex items-center gap-1.5">
-                    {token.type === "color" ? (
-                      <div
-                        className="w-4 h-4 rounded-sm border border-border-default"
-                        style={{ backgroundColor: token.value as string }}
-                      />
-                    ) : null}
                     <Field>
                       <TableInput
+                        variant={inputVariant}
+                        colorValue={
+                          inputVariant === "color"
+                            ? (colorValues[token.id] ?? (token.value as string))
+                            : undefined
+                        }
                         defaultValue={displayValue}
                         aria-invalid={Boolean(errors[token.id])}
                         onBlur={(e) => {
@@ -91,7 +93,12 @@ export function TokenTable({ type, tokens }: TokenTableProps) {
                               [token.id]: result.reason,
                             }));
                           } else {
-                            console.log(result.value);
+                            if (inputVariant === "color") {
+                              setColorValues((prev) => ({
+                                ...prev,
+                                [token.id]: result.value as string,
+                              }));
+                            }
                             setErrors((prev) => {
                               const { [token.id]: _removed, ...rest } = prev;
                               return rest;

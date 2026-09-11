@@ -35,6 +35,7 @@
   --color-border-default: light-dark(#dedede, #434343);
   --color-border-default-hover: light-dark(#c3bcbc, #3f4e68);
   --color-border-warning: light-dark(#fcd34d, #ca8a04);
+  --color-border-destructive: light-dark(var(--destructive));
   --color-border-on-dark: light-dark(#273347, #273347);
 
   --spacing-space-2xs: 4px;
