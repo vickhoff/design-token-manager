@@ -8,12 +8,13 @@ import {
   TableCell,
   TableCaption,
 } from "@/components/ui/table";
-import { Field } from "@/components/ui/field";
+import { Field, FieldError } from "@/components/ui/field";
 import { type Token } from "../../../lib/tokens/types";
 import { firstLetterUpperCase } from "../../../lib/utils";
 import { Palette, Type, SquareDashed, CircleQuestionMark } from "lucide-react";
 import { TableInput } from "./TableInput";
 import { parseValue } from "@/lib/tokens/parseTokensCss";
+import { useState } from "react";
 
 interface TokenTableProps {
   type: string;
@@ -41,6 +42,8 @@ function renderIcon(type: string) {
 }
 
 export function TokenTable({ type, tokens }: TokenTableProps) {
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
   return (
     <section className="bg-surface-default border border-border-default rounded-(--radius-xl) p-4 w-full">
       <h2 className="font-medium">
@@ -78,16 +81,25 @@ export function TokenTable({ type, tokens }: TokenTableProps) {
                     <Field>
                       <TableInput
                         defaultValue={displayValue}
+                        aria-invalid={Boolean(errors[token.id])}
                         onBlur={(e) => {
                           const result = parseValue(token.type, e.target.value);
                           if (!result.ok) {
                             e.target.value = displayValue;
-                            console.log(result.reason);
+                            setErrors((prev) => ({
+                              ...prev,
+                              [token.id]: result.reason,
+                            }));
                           } else {
                             console.log(result.value);
+                            setErrors((prev) => {
+                              const { [token.id]: _removed, ...rest } = prev;
+                              return rest;
+                            });
                           }
                         }}
                       />
+                      <FieldError>{errors[token.id]}</FieldError>
                     </Field>
                   </span>
                 </TableCell>

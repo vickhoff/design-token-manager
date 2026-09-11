@@ -81,13 +81,13 @@ function parseValue(type: TokenType, rawValue: string): ParsedValue {
   if (type === "color") {
     return COLOR_RE.test(value)
       ? { ok: true, value }
-      : { ok: false, reason: "Invalid color value" };
+      : { ok: false, reason: `${value} is not a valid color value` };
   }
 
   if (type === "dimension") {
     const dimension = parseDimension(value);
     if (dimension === null) {
-      return { ok: false, reason: "Invalid dimension value" };
+      return { ok: false, reason: `${value} is not a valid dimension value` };
     }
     return { ok: true, value: dimension };
   }
@@ -105,7 +105,7 @@ function parseValue(type: TokenType, rawValue: string): ParsedValue {
   if (WEIGHT_KEYWORDS.has(value)) return { ok: true, value };
 
   if (value.length === 0) {
-    return { ok: false, reason: "Invalid typography value" };
+    return { ok: false, reason: `Can't be empty` };
   }
   return { ok: true, value };
 }
