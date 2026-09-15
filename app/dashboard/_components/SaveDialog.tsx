@@ -38,10 +38,17 @@ const checkboxes: CheckBox[] = [
   },
 ];
 
-export function SaveDialog() {
+export function SaveDialog({ fileHasChanged }: { fileHasChanged: boolean }) {
   return (
     <Dialog>
-      <DialogTrigger render={<Button variant="default">Save</Button>} />
+      <DialogTrigger
+        render={
+          <Button disabled={!fileHasChanged} variant="default">
+            Save
+          </Button>
+        }
+      />
+
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
           <DialogTitle>Save and download tokens</DialogTitle>

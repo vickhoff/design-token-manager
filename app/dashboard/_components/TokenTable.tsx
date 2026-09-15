@@ -15,7 +15,7 @@ import { Palette, Type, SquareDashed, CircleQuestionMark } from "lucide-react";
 import { TableInput } from "./TableInput";
 import { parseValue } from "@/lib/tokens/parseTokensCss";
 import { useState } from "react";
-import { useAppDispatch } from "@/lib/hooks";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { updateTokenFile } from "@/lib/state/features/tokenFile/tokenFileSlice";
 
 interface TokenTableProps {
