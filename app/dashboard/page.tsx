@@ -12,6 +12,8 @@ import {
   CardContent,
 } from "@/components/ui/card";
 
+import { SaveDialog } from "./_components/SaveDialog";
+
 import { ButtonGroup, ButtonGroupText } from "@/components/ui/button-group";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -35,6 +37,7 @@ export default function Dashboard() {
   const isLoaded = jsonFile !== null;
   const hasWarnings = jsonFile !== null && jsonFile.warnings.length > 0;
   const [status, setStatus] = useState<Status>("empty");
+
   const dispatch = useAppDispatch();
 
   async function handleChooseFolder() {
@@ -78,7 +81,7 @@ export default function Dashboard() {
                     {rawFile?.title}
                   </ButtonGroupText>
                 </ButtonGroup>
-                <Button>Save</Button>
+                <SaveDialog />
               </CardContent>
               {hasWarnings && (
                 <CardFooter className="flex-col gap-2 bg-surface-default">
