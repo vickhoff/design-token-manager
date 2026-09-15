@@ -15,6 +15,8 @@ import { Palette, Type, SquareDashed, CircleQuestionMark } from "lucide-react";
 import { TableInput } from "./TableInput";
 import { parseValue } from "@/lib/tokens/parseTokensCss";
 import { useState } from "react";
+import { useAppDispatch } from "@/lib/hooks";
+import { updateTokenFile } from "@/lib/state/features/tokenFile/tokenFileSlice";
 
 interface TokenTableProps {
   type: string;
@@ -44,6 +46,9 @@ function renderIcon(type: string) {
 export function TokenTable({ type, tokens }: TokenTableProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [colorValues, setColorValues] = useState<Record<string, string>>({});
+  const [inputValues, setInputValues] = useState<Record<string, string>>({});
+
+  const dispatch = useAppDispatch();
 
   return (
     <section className="bg-surface-default border border-border-default rounded-(--radius-xl) p-4 w-full">
@@ -60,10 +65,11 @@ export function TokenTable({ type, tokens }: TokenTableProps) {
         <TableBody>
           {tokens.map((token) => {
             const inputVariant = token.type === "color" ? "color" : "default";
-            const displayValue =
+            const originalDisplayValue =
               typeof token.value === "object"
                 ? `${token.value.value}${token.value.unit}`
                 : String(token.value);
+            const displayValue = inputValues[token.id] ?? originalDisplayValue;
             return (
               <TableRow className="font-mono min-h-[64]" key={token.id}>
                 <TableCell className="min-h-[64]">
@@ -82,12 +88,21 @@ export function TokenTable({ type, tokens }: TokenTableProps) {
                             ? (colorValues[token.id] ?? (token.value as string))
                             : undefined
                         }
-                        defaultValue={displayValue}
+                        value={displayValue}
+                        onChange={(e) => {
+                          setInputValues((prev) => ({
+                            ...prev,
+                            [token.id]: e.target.value,
+                          }));
+                        }}
                         aria-invalid={Boolean(errors[token.id])}
                         onBlur={(e) => {
                           const result = parseValue(token.type, e.target.value);
                           if (!result.ok) {
-                            e.target.value = displayValue;
+                            setInputValues((prev) => ({
+                              ...prev,
+                              [token.id]: displayValue,
+                            }));
                             setErrors((prev) => ({
                               ...prev,
                               [token.id]: result.reason,
@@ -99,6 +114,14 @@ export function TokenTable({ type, tokens }: TokenTableProps) {
                                 [token.id]: result.value as string,
                               }));
                             }
+
+                            dispatch(
+                              updateTokenFile({
+                                id: token.id,
+                                value: result.value,
+                              }),
+                            );
+
                             setErrors((prev) => {
                               const { [token.id]: _removed, ...rest } = prev;
                               return rest;
