@@ -8,9 +8,15 @@ import {
   TableCell,
   TableCaption,
 } from "@/components/ui/table";
+import { Field, FieldError } from "@/components/ui/field";
 import { type Token } from "../../../lib/tokens/types";
 import { firstLetterUpperCase } from "../../../lib/utils";
 import { Palette, Type, SquareDashed, CircleQuestionMark } from "lucide-react";
+import { TableInput } from "./TableInput";
+import { parseValue } from "@/lib/tokens/parseTokensCss";
+import { useState } from "react";
+import { useAppDispatch } from "@/lib/hooks";
+import { updateTokenFile } from "@/lib/state/features/tokenFile/tokenFileSlice";
 
 interface TokenTableProps {
   type: string;
@@ -38,9 +44,17 @@ function renderIcon(type: string) {
 }
 
 export function TokenTable({ type, tokens }: TokenTableProps) {
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [colorValues, setColorValues] = useState<Record<string, string>>({});
+  const [inputValues, setInputValues] = useState<Record<string, string>>({});
+
+  const dispatch = useAppDispatch();
+
   return (
     <section className="bg-surface-default border border-border-default rounded-(--radius-xl) p-4 w-full">
-      <h2>{firstLetterUpperCase(type)}</h2>
+      <h2 className="font-medium">
+        {firstLetterUpperCase(type)} ({tokens.length})
+      </h2>
       <Table className="table-fixed">
         <TableHeader>
           <TableRow>
@@ -49,31 +63,79 @@ export function TokenTable({ type, tokens }: TokenTableProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {tokens.map((token) => (
-            <TableRow className="font-mono" key={token.id}>
-              <TableCell>
-                <span className="flex items-center gap-1.5">
-                  {renderIcon(token.type as string)}
-                  <code>{token.id}</code>
-                </span>
-              </TableCell>
-              <TableCell>
-                <span className="flex items-center gap-1.5">
-                  {token.type === "color" ? (
-                    <div
-                      className="w-4 h-4 rounded-sm border border-border-default"
-                      style={{ backgroundColor: token.value as string }}
-                    />
-                  ) : null}
-                  <code>
-                    {typeof token.value === "object"
-                      ? `${token.value.value}${token.value.unit}`
-                      : token.value}
-                  </code>
-                </span>
-              </TableCell>
-            </TableRow>
-          ))}
+          {tokens.map((token) => {
+            const inputVariant = token.type === "color" ? "color" : "default";
+            const originalDisplayValue =
+              typeof token.value === "object"
+                ? `${token.value.value}${token.value.unit}`
+                : String(token.value);
+            const displayValue = inputValues[token.id] ?? originalDisplayValue;
+            return (
+              <TableRow className="font-mono min-h-[64]" key={token.id}>
+                <TableCell className="min-h-[64]">
+                  <span className="flex items-center gap-1.5">
+                    {renderIcon(token.type as string)}
+                    <code>{token.id}</code>
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <span className="flex items-center gap-1.5">
+                    <Field>
+                      <TableInput
+                        variant={inputVariant}
+                        colorValue={
+                          inputVariant === "color"
+                            ? (colorValues[token.id] ?? (token.value as string))
+                            : undefined
+                        }
+                        value={displayValue}
+                        onChange={(e) => {
+                          setInputValues((prev) => ({
+                            ...prev,
+                            [token.id]: e.target.value,
+                          }));
+                        }}
+                        aria-invalid={Boolean(errors[token.id])}
+                        onBlur={(e) => {
+                          const result = parseValue(token.type, e.target.value);
+                          if (!result.ok) {
+                            setInputValues((prev) => ({
+                              ...prev,
+                              [token.id]: displayValue,
+                            }));
+                            setErrors((prev) => ({
+                              ...prev,
+                              [token.id]: result.reason,
+                            }));
+                          } else {
+                            if (inputVariant === "color") {
+                              setColorValues((prev) => ({
+                                ...prev,
+                                [token.id]: result.value as string,
+                              }));
+                            }
+
+                            dispatch(
+                              updateTokenFile({
+                                id: token.id,
+                                value: result.value,
+                              }),
+                            );
+
+                            setErrors((prev) => {
+                              const { [token.id]: _removed, ...rest } = prev;
+                              return rest;
+                            });
+                          }
+                        }}
+                      />
+                      <FieldError>{errors[token.id]}</FieldError>
+                    </Field>
+                  </span>
+                </TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </section>

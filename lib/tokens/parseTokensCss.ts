@@ -15,6 +15,7 @@ import {
   type Token,
   type ParseWarning,
   type ParseResult,
+  type ParsedValue,
 } from "./types";
 
 const DIMENSION_UNITS = new Set(["px", "rem", "em", "%"]);
@@ -74,18 +75,21 @@ function parseDimension(value: string): DimensionValue | null {
   return { value: Number(num), unit };
 }
 
-function parseValue(
-  type: TokenType,
-  rawValue: string,
-): string | number | DimensionValue | null {
+function parseValue(type: TokenType, rawValue: string): ParsedValue {
   const value = rawValue.trim();
 
   if (type === "color") {
-    return COLOR_RE.test(value) ? value : null;
+    return COLOR_RE.test(value)
+      ? { ok: true, value }
+      : { ok: false, reason: `${value} is not a valid color value` };
   }
 
   if (type === "dimension") {
-    return parseDimension(value);
+    const dimension = parseDimension(value);
+    if (dimension === null) {
+      return { ok: false, reason: `${value} is not a valid dimension value` };
+    }
+    return { ok: true, value: dimension };
   }
 
   // typography: no naming signal for which "kind" of value this is, so
@@ -95,12 +99,15 @@ function parseValue(
   // dimension — font-family values are inherently free-form, so there's
   // no shape check to reject against).
   const dimension = parseDimension(value);
-  if (dimension !== null) return dimension;
+  if (dimension !== null) return { ok: true, value: dimension };
 
-  if (/^\d+$/.test(value)) return Number(value);
-  if (WEIGHT_KEYWORDS.has(value)) return value;
+  if (/^\d+$/.test(value)) return { ok: true, value: Number(value) };
+  if (WEIGHT_KEYWORDS.has(value)) return { ok: true, value };
 
-  return value.length > 0 ? value : null;
+  if (value.length === 0) {
+    return { ok: false, reason: `Can't be empty` };
+  }
+  return { ok: true, value };
 }
 
 // --- overall skip-and-collect pipeline ----------------------------------
@@ -116,7 +123,7 @@ function extractRootDeclarations(cssText: string): string[] {
     .filter(Boolean);
 }
 
-export function parseCssTokens(cssText: string): ParseResult {
+function parseCssTokens(cssText: string): ParseResult {
   const warnings: ParseWarning[] = [];
   const declarations = extractRootDeclarations(cssText);
 
@@ -149,24 +156,24 @@ export function parseCssTokens(cssText: string): ParseResult {
 
     const { type, subgroup, name } = split;
     const parsed = parseValue(type, rawValue);
-    if (parsed === null) {
+    if (!parsed.ok) {
       warnings.push({
         property,
-        reason: `invalid ${type} value "${rawValue}"`,
+        reason: parsed.reason,
       });
       continue;
     }
-
-    const fullName = `${type}.${!subgroup ? "" : subgroup + "."}${name}`;
 
     tokens.push({
       id: tokenId(type, subgroup, name),
       type,
       subgroup,
       name,
-      value: parsed,
+      value: parsed.value,
     });
   }
 
   return { tokens, warnings };
 }
+
+export { parseValue, parseDimension, parseCssTokens };

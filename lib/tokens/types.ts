@@ -28,6 +28,10 @@ interface ParseWarning {
   reason: string;
 }
 
+type ParsedValue =
+  | { ok: true; value: string | number | DimensionValue }
+  | { ok: false; reason: string };
+
 interface ParseResult {
   tokens: Token[];
   warnings: ParseWarning[];
@@ -42,4 +46,5 @@ export {
   type ParseWarning,
   type ParseResult,
   type FileObject,
+  type ParsedValue,
 };
