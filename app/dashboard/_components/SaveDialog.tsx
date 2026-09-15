@@ -30,11 +30,11 @@ type CheckBox = {
 const checkboxes: CheckBox[] = [
   {
     title: "JSON file",
-    description: "Save a JSON file with your tokens",
+    description: "Save a tokens.json to the folder you choose",
   },
   {
     title: "CSS file",
-    description: "Save a CSS file with your tokens",
+    description: "Save a tokens.css file to the folder you choose",
   },
 ];
 
@@ -46,13 +46,14 @@ export function SaveDialog() {
         <DialogHeader>
           <DialogTitle>Save and download tokens</DialogTitle>
           <DialogDescription>
-            Choose what type of file you want to download to your local folder
+            Choose what type of file you want to save to your chosen folder.
+            This will overwrite the token file.
           </DialogDescription>
         </DialogHeader>
         <form>
           <FieldGroup className="max-w-sm gap-2">
             {checkboxes.map((item, i) => (
-              <FieldLabel>
+              <FieldLabel key={item.title}>
                 <Field orientation="horizontal">
                   <Checkbox
                     id={`toggle-checkbox-${i + 1}`}
