@@ -28,6 +28,8 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 
+import { ReactElement, useState } from "react";
+
 type CheckBox = {
   title: string;
   description: string;
@@ -44,30 +46,50 @@ const checkboxes: CheckBox[] = [
   },
 ];
 
+function renderButtonWithDisabledTooltip(
+  isDisabled: boolean,
+  buttonText: string,
+  tooltipText: string,
+): ReactElement {
+  return isDisabled ? (
+    <Tooltip>
+      <TooltipTrigger
+        render={
+          <span className="inline-block w-fit">
+            <Button disabled variant="default">
+              {buttonText}
+            </Button>
+          </span>
+        }
+      />
+      <TooltipContent>
+        <p>{tooltipText}</p>
+      </TooltipContent>
+    </Tooltip>
+  ) : (
+    <Button variant="default">{buttonText}</Button>
+  );
+}
+
 export function SaveDialog({ fileHasChanged }: { fileHasChanged: boolean }) {
+  const [selectedFormats, setSelectedFormats] = useState<
+    Record<string, boolean>
+  >({
+    "JSON file": true,
+    "CSS file": true,
+  });
+
+  const nothingToSave = !fileHasChanged;
+  const noFormatSelected = Object.values(selectedFormats).every((v) => !v);
+
   return (
     <Dialog>
       <DialogTrigger
-        render={
-          fileHasChanged ? (
-            <Button variant="default">Save</Button>
-          ) : (
-            <Tooltip>
-              <TooltipTrigger
-                render={
-                  <span className="inline-block w-fit">
-                    <Button disabled variant="default">
-                      Save
-                    </Button>
-                  </span>
-                }
-              />
-              <TooltipContent>
-                <p>Edit a token to enable saving</p>
-              </TooltipContent>
-            </Tooltip>
-          )
-        }
+        render={renderButtonWithDisabledTooltip(
+          nothingToSave,
+          "Save",
+          "Edit a token to enable saving",
+        )}
       />
 
       <DialogContent className="sm:max-w-sm">
@@ -86,7 +108,15 @@ export function SaveDialog({ fileHasChanged }: { fileHasChanged: boolean }) {
                   <Checkbox
                     id={`toggle-checkbox-${i + 1}`}
                     name={`toggle-checkbox-${i + 1}`}
+                    checked={selectedFormats[item.title]}
+                    onCheckedChange={(checked) =>
+                      setSelectedFormats((prev) => ({
+                        ...prev,
+                        [item.title]: checked,
+                      }))
+                    }
                   />
+
                   <FieldContent>
                     <FieldTitle>{item.title}</FieldTitle>
                     <FieldDescription>{item.description}</FieldDescription>
@@ -98,7 +128,11 @@ export function SaveDialog({ fileHasChanged }: { fileHasChanged: boolean }) {
         </form>
         <DialogFooter>
           <DialogClose render={<Button variant="outline">Cancel</Button>} />
-          <Button type="submit">Save to file</Button>
+          {renderButtonWithDisabledTooltip(
+            noFormatSelected,
+            "Save to file",
+            "Choose at least one option",
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -38,3 +38,7 @@ export async function loadTokenFile() {
   const jsonFile = parseCssTokens(rawFile.content);
   return { rawFile, jsonFile };
 }
+
+export async function saveTokenFile() {
+  return {};
+}
