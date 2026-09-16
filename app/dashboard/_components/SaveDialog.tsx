@@ -50,13 +50,14 @@ function renderButtonWithDisabledTooltip(
   isDisabled: boolean,
   buttonText: string,
   tooltipText: string,
+  type?: React.ComponentProps<typeof Button>["type"],
 ): ReactElement {
   return isDisabled ? (
     <Tooltip>
       <TooltipTrigger
         render={
           <span className="inline-block w-fit">
-            <Button disabled variant="default">
+            <Button type={type} disabled variant="default">
               {buttonText}
             </Button>
           </span>
@@ -67,7 +68,9 @@ function renderButtonWithDisabledTooltip(
       </TooltipContent>
     </Tooltip>
   ) : (
-    <Button variant="default">{buttonText}</Button>
+    <Button variant="default" type={type}>
+      {buttonText}
+    </Button>
   );
 }
 
@@ -132,6 +135,7 @@ export function SaveDialog({ fileHasChanged }: { fileHasChanged: boolean }) {
             noFormatSelected,
             "Save to file",
             "Choose at least one option",
+            "submit",
           )}
         </DialogFooter>
       </DialogContent>
