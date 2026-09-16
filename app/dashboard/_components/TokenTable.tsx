@@ -15,7 +15,7 @@ import { Palette, Type, SquareDashed, CircleQuestionMark } from "lucide-react";
 import { TableInput } from "./TableInput";
 import { parseValue } from "@/lib/tokens/parseTokensCss";
 import { useState } from "react";
-import { useAppDispatch } from "@/lib/hooks";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { updateTokenFile } from "@/lib/state/features/tokenFile/tokenFileSlice";
 
 interface TokenTableProps {
@@ -82,6 +82,7 @@ export function TokenTable({ type, tokens }: TokenTableProps) {
                   <span className="flex items-center gap-1.5">
                     <Field>
                       <TableInput
+                        className="max-w-[280]"
                         variant={inputVariant}
                         colorValue={
                           inputVariant === "color"

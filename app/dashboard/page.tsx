@@ -12,6 +12,8 @@ import {
   CardContent,
 } from "@/components/ui/card";
 
+import { SaveDialog } from "./_components/SaveDialog";
+
 import { ButtonGroup, ButtonGroupText } from "@/components/ui/button-group";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -31,16 +33,20 @@ type Status = "empty" | "loading" | "error";
 export default function Dashboard() {
   const rawFile = useAppSelector((state) => state.tokenFile.rawFile);
   const jsonFile = useAppSelector((state) => state.tokenFile.jsonFile);
+  const originalFile = useAppSelector((state) => state.tokenFile.originalFile);
 
+  const fileHasChanged =
+    JSON.stringify(jsonFile?.tokens) !== JSON.stringify(originalFile?.tokens);
   const isLoaded = jsonFile !== null;
   const hasWarnings = jsonFile !== null && jsonFile.warnings.length > 0;
   const [status, setStatus] = useState<Status>("empty");
+
   const dispatch = useAppDispatch();
 
   async function handleChooseFolder() {
     try {
       const { rawFile, jsonFile } = await loadTokenFile();
-      dispatch(setTokenFile({ rawFile, jsonFile }));
+      dispatch(setTokenFile({ rawFile, jsonFile, originalFile: jsonFile }));
     } catch (error) {
       console.log("falling back to defaults:", DEFAULT_TOKENS, error);
       setStatus("error");
@@ -78,7 +84,7 @@ export default function Dashboard() {
                     {rawFile?.title}
                   </ButtonGroupText>
                 </ButtonGroup>
-                <Button>Save</Button>
+                <SaveDialog fileHasChanged={fileHasChanged} />
               </CardContent>
               {hasWarnings && (
                 <CardFooter className="flex-col gap-2 bg-surface-default">

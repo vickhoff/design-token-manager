@@ -4,6 +4,7 @@ import type { ParseResult, FileObject, Token } from "@/lib/tokens/types";
 export interface TokenFileState {
   rawFile: FileObject | null;
   jsonFile: ParseResult | null;
+  originalFile: ParseResult | null;
 }
 
 export interface UpdateTokenFileState {
@@ -14,6 +15,7 @@ export interface UpdateTokenFileState {
 const initialState: TokenFileState = {
   rawFile: null,
   jsonFile: null,
+  originalFile: null,
 };
 
 const tokenFileSlice = createSlice({
@@ -23,6 +25,7 @@ const tokenFileSlice = createSlice({
     setTokenFile(state, action: PayloadAction<TokenFileState>) {
       state.rawFile = action.payload.rawFile;
       state.jsonFile = action.payload.jsonFile;
+      state.originalFile = action.payload.originalFile;
     },
     updateTokenFile(state, action: PayloadAction<UpdateTokenFileState>) {
       if (!state.jsonFile) return;
@@ -35,6 +38,7 @@ const tokenFileSlice = createSlice({
     clearTokenFile(state) {
       state.rawFile = null;
       state.jsonFile = null;
+      state.originalFile = null;
     },
   },
 });

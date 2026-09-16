@@ -20,7 +20,6 @@ export async function getFileContent(root: FileSystemDirectoryHandle) {
   for await (const [name, handle] of root.entries()) {
     if (name === "tokens.css" && handle.kind === "file") {
       const file = await handle.getFile();
-      console.log(file);
       const content = await file.text();
       const title = file.name;
 
@@ -38,4 +37,8 @@ export async function loadTokenFile() {
   const rawFile = await getFileContent(root);
   const jsonFile = parseCssTokens(rawFile.content);
   return { rawFile, jsonFile };
+}
+
+export async function saveTokenFile() {
+  return {};
 }
