@@ -82,6 +82,7 @@ export function TokenTable({ type, tokens }: TokenTableProps) {
                   <span className="flex items-center gap-1.5">
                     <Field>
                       <TableInput
+                        className="max-w-[280]"
                         variant={inputVariant}
                         colorValue={
                           inputVariant === "color"

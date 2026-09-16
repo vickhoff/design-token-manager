@@ -11,6 +11,12 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import {
@@ -43,9 +49,24 @@ export function SaveDialog({ fileHasChanged }: { fileHasChanged: boolean }) {
     <Dialog>
       <DialogTrigger
         render={
-          <Button disabled={!fileHasChanged} variant="default">
-            Save
-          </Button>
+          fileHasChanged ? (
+            <Button variant="default">Save</Button>
+          ) : (
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <span className="inline-block w-fit">
+                    <Button disabled variant="default">
+                      Save
+                    </Button>
+                  </span>
+                }
+              />
+              <TooltipContent>
+                <p>Edit a token to enable saving</p>
+              </TooltipContent>
+            </Tooltip>
+          )
         }
       />
 

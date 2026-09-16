@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import StoreProvider from "./StoreProvider";
 import { ThemeProvider } from "@/components/theme-provider";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const geist = Geist({
   variable: "--font-sans",
@@ -28,7 +29,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col bg-body font-sans">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <StoreProvider>{children}</StoreProvider>
+          <StoreProvider>
+            <TooltipProvider>{children}</TooltipProvider>
+          </StoreProvider>
         </ThemeProvider>
       </body>
     </html>
