@@ -12,6 +12,8 @@ export const DEFAULT_TOKENS = {
   },
 };
 
+let directoryHandle: FileSystemDirectoryHandle | null = null;
+
 export async function getFolder() {
   return await window.showDirectoryPicker({ mode: "read" });
 }
@@ -34,6 +36,7 @@ export async function getFileContent(root: FileSystemDirectoryHandle) {
 
 export async function loadTokenFile() {
   const root = await getFolder();
+  directoryHandle = root;
   const rawFile = await getFileContent(root);
   const jsonFile = parseCssTokens(rawFile.content);
   return { rawFile, jsonFile };
