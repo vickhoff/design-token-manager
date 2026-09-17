@@ -1,12 +1,4 @@
-import {
-  isTokenType,
-  type TokenType,
-  type DimensionValue,
-  type Token,
-  type ParseWarning,
-  type ParseResult,
-  type ParsedValue,
-} from "./types";
+import { type TokenType, type Token } from "./types";
 
 function tokenProperty(
   type: TokenType,
@@ -24,3 +16,18 @@ function tokenValue(token: Token): string {
 
   return "Something went wrong";
 }
+
+function serializeCssTokens(tokens: Token[]): string {
+  const lines = tokens.map((token) => {
+    const property = tokenProperty(token.type, token.subgroup, token.name);
+    const value = tokenValue(token);
+
+    return `  ${property}: ${value};`;
+  });
+
+  const declarations = lines.join("\n");
+
+  return `:root {\n${declarations}\n}\n`;
+}
+
+export { serializeCssTokens };
