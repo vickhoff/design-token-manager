@@ -1,4 +1,5 @@
 "use client";
+import { serializeCssTokens } from "@/lib/tokens/serializeTokensCss";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { DEFAULT_TOKENS, loadTokenFile } from "@/lib/tokenFileSystem";
@@ -42,6 +43,8 @@ export default function Dashboard() {
   const [status, setStatus] = useState<Status>("empty");
 
   const dispatch = useAppDispatch();
+
+  console.log(serializeCssTokens(jsonFile));
 
   async function handleChooseFolder() {
     try {
