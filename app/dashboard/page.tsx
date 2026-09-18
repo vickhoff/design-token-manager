@@ -49,7 +49,7 @@ export default function Dashboard() {
       const { rawFile, jsonFile } = await loadTokenFile();
       dispatch(setTokenFile({ rawFile, jsonFile, originalFile: jsonFile }));
     } catch (error) {
-      console.log("falling back to defaults:", DEFAULT_TOKENS, error);
+      console.log(error);
       setStatus("empty");
     }
   }

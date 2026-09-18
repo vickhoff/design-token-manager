@@ -176,4 +176,4 @@ function parseCssTokens(cssText: string): ParseResult {
   return { tokens, warnings };
 }
 
-export { parseValue, parseDimension, parseCssTokens };
+export { parseValue, parseDimension, parseCssTokens, tokenId };

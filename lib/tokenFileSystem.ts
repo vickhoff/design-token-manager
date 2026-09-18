@@ -1,6 +1,7 @@
 import { parseCssTokens } from "./tokens/parseTokensCss";
+import { parseJsonTokens } from "./tokens/parseTokensJson";
 import { serializeCssTokens, serializeJsonTokens } from "./tokens/serializers";
-import type { Token } from "./tokens/types";
+import type { ParseResult, Token } from "./tokens/types";
 
 export const DEFAULT_TOKENS = {
   color: {
@@ -20,27 +21,42 @@ export async function getFolder() {
   return await window.showDirectoryPicker({ mode: "read" });
 }
 
-export async function getFileContent(root: FileSystemDirectoryHandle) {
-  for await (const [name, handle] of root.entries()) {
-    if (name === "tokens.css" && handle.kind === "file") {
-      const file = await handle.getFile();
-      const content = await file.text();
-      const title = file.name;
+async function readFile(root: FileSystemDirectoryHandle, name: string) {
+  const fileHandle = await root.getFileHandle(name);
+  const file = await fileHandle.getFile();
+  const content = await file.text();
+  const title = file.name;
+  return { content, title };
+}
 
-      if (content.trim().length === 0) {
-        throw new Error("The file is empty");
-      }
-      return { content, title };
+export async function getFileContent(root: FileSystemDirectoryHandle) {
+  let result: { content: string; title: string };
+
+  try {
+    result = await readFile(root, "tokens.json");
+  } catch (error) {
+    try {
+      result = await readFile(root, "tokens.css");
+    } catch (error) {
+      throw new Error("Neither tokens.json or tokens.css exists");
     }
   }
-  throw new Error("tokens.json or tokens.css not found in this folder");
+  if (result.content.trim().length === 0) {
+    throw new Error("The file is empty");
+  }
+  return result;
 }
 
 export async function loadTokenFile() {
   const root = await getFolder();
   directoryHandle = root;
   const rawFile = await getFileContent(root);
-  const jsonFile = parseCssTokens(rawFile.content);
+
+  const jsonFile: ParseResult =
+    rawFile.title === "tokens.json"
+      ? parseJsonTokens(rawFile.content)
+      : parseCssTokens(rawFile.content);
+
   return { rawFile, jsonFile };
 }
 
