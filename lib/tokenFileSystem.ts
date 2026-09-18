@@ -44,6 +44,15 @@ export async function loadTokenFile() {
   return { rawFile, jsonFile };
 }
 
+async function createWritable(name: string, content: string) {
+  const fileHandle = await directoryHandle?.getFileHandle(name, {
+    create: true,
+  });
+  const writable = await fileHandle?.createWritable();
+  await writable?.write(content);
+  await writable?.close();
+}
+
 export async function saveTokenFile(
   tokens: Token[],
   selectedFormats: { json: boolean; css: boolean },
@@ -56,17 +65,29 @@ export async function saveTokenFile(
     (await directoryHandle.requestPermission({ mode: "readwrite" })) ===
     "granted"
   ) {
-    let jsonTokens: string | undefined;
-    let cssTokens: string | undefined;
+    let serializedJsonTokens: string | undefined;
+    let serializedCssTokens: string | undefined;
+    let writables = [];
 
     if (selectedFormats.css) {
-      cssTokens = serializeCssTokens(tokens);
+      serializedCssTokens = serializeCssTokens(tokens);
+      const saveCssTokens = await createWritable(
+        "tokens.css",
+        serializedCssTokens,
+      );
+      console.log(saveCssTokens);
+      writables.push(saveCssTokens);
     }
     if (selectedFormats.json) {
-      jsonTokens = serializeJsonTokens(tokens);
+      serializedJsonTokens = serializeJsonTokens(tokens);
+      const saveJsonTokens = await createWritable(
+        "tokens.json",
+        serializedJsonTokens,
+      );
+      writables.push(saveJsonTokens);
     }
 
-    return { cssTokens, jsonTokens };
+    return { writables };
   }
   throw new Error("No access granted");
 }

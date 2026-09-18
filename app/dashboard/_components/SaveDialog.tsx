@@ -34,16 +34,19 @@ import { saveTokenFile } from "@/lib/tokenFileSystem";
 import type { Token } from "@/lib/tokens/types";
 
 type CheckBox = {
+  key: "json" | "css";
   title: string;
   description: string;
 };
 
 const checkboxes: CheckBox[] = [
   {
+    key: "json",
     title: "JSON file",
     description: "Save a tokens.json to the folder you choose",
   },
   {
+    key: "css",
     title: "CSS file",
     description: "Save a tokens.css file to the folder you choose",
   },
@@ -84,21 +87,17 @@ interface SaveDialogProps {
 
 export function SaveDialog({ tokens, fileHasChanged }: SaveDialogProps) {
   const [selectedFormats, setSelectedFormats] = useState<
-    Record<string, boolean>
+    Record<CheckBox["key"], boolean>
   >({
-    "JSON file": true,
-    "CSS file": true,
+    json: true,
+    css: true,
   });
 
-  function handleSave() {
-    const formats = {
-      json: selectedFormats["JSON file"],
-      css: selectedFormats["CSS file"],
-    };
+  async function handleSave(e: React.SubmitEvent<HTMLFormElement>) {
+    e.preventDefault();
 
     try {
-      saveTokenFile(tokens, formats);
-      console.log(formats);
+      await saveTokenFile(tokens, selectedFormats);
     } catch (error) {
       error;
     }
@@ -133,11 +132,11 @@ export function SaveDialog({ tokens, fileHasChanged }: SaveDialogProps) {
                   <Checkbox
                     id={`toggle-checkbox-${i + 1}`}
                     name={`toggle-checkbox-${i + 1}`}
-                    checked={selectedFormats[item.title]}
+                    checked={selectedFormats[item.key]}
                     onCheckedChange={(checked) =>
                       setSelectedFormats((prev) => ({
                         ...prev,
-                        [item.title]: checked,
+                        [item.key]: checked,
                       }))
                     }
                   />
