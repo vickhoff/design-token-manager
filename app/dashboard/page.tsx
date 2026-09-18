@@ -1,5 +1,5 @@
 "use client";
-import { serializeCssTokens } from "@/lib/tokens/serializeTokensCss";
+import { serializeCssTokens } from "@/lib/tokens/serializers";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { DEFAULT_TOKENS, loadTokenFile } from "@/lib/tokenFileSystem";
@@ -44,15 +44,13 @@ export default function Dashboard() {
 
   const dispatch = useAppDispatch();
 
-  console.log(serializeCssTokens(jsonFile));
-
   async function handleChooseFolder() {
     try {
       const { rawFile, jsonFile } = await loadTokenFile();
       dispatch(setTokenFile({ rawFile, jsonFile, originalFile: jsonFile }));
     } catch (error) {
       console.log("falling back to defaults:", DEFAULT_TOKENS, error);
-      setStatus("error");
+      setStatus("empty");
     }
   }
   function handleReset() {
@@ -87,7 +85,10 @@ export default function Dashboard() {
                     {rawFile?.title}
                   </ButtonGroupText>
                 </ButtonGroup>
-                <SaveDialog fileHasChanged={fileHasChanged} />
+                <SaveDialog
+                  tokens={jsonFile.tokens}
+                  fileHasChanged={fileHasChanged}
+                />
               </CardContent>
               {hasWarnings && (
                 <CardFooter className="flex-col gap-2 bg-surface-default">

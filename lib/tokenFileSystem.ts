@@ -1,4 +1,6 @@
 import { parseCssTokens } from "./tokens/parseTokensCss";
+import { serializeCssTokens, serializeJsonTokens } from "./tokens/serializers";
+import type { Token } from "./tokens/types";
 
 export const DEFAULT_TOKENS = {
   color: {
@@ -42,6 +44,49 @@ export async function loadTokenFile() {
   return { rawFile, jsonFile };
 }
 
-export async function saveTokenFile() {
-  return {};
+async function createWritable(name: string, content: string) {
+  const fileHandle = await directoryHandle?.getFileHandle(name, {
+    create: true,
+  });
+  const writable = await fileHandle?.createWritable();
+  await writable?.write(content);
+  await writable?.close();
+}
+
+export async function saveTokenFile(
+  tokens: Token[],
+  selectedFormats: { json: boolean; css: boolean },
+) {
+  if (!directoryHandle) {
+    const root = await getFolder();
+    directoryHandle = root;
+  }
+  if (
+    (await directoryHandle.requestPermission({ mode: "readwrite" })) ===
+    "granted"
+  ) {
+    let serializedJsonTokens: string | undefined;
+    let serializedCssTokens: string | undefined;
+    let writables = [];
+
+    if (selectedFormats.css) {
+      serializedCssTokens = serializeCssTokens(tokens);
+      const saveCssTokens = await createWritable(
+        "tokens.css",
+        serializedCssTokens,
+      );
+      writables.push(saveCssTokens);
+    }
+    if (selectedFormats.json) {
+      serializedJsonTokens = serializeJsonTokens(tokens);
+      const saveJsonTokens = await createWritable(
+        "tokens.json",
+        serializedJsonTokens,
+      );
+      writables.push(saveJsonTokens);
+    }
+
+    return { writables };
+  }
+  throw new Error("No access granted");
 }
