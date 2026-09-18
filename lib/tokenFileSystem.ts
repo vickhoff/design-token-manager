@@ -75,7 +75,6 @@ export async function saveTokenFile(
         "tokens.css",
         serializedCssTokens,
       );
-      console.log(saveCssTokens);
       writables.push(saveCssTokens);
     }
     if (selectedFormats.json) {

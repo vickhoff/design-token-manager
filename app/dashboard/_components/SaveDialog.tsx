@@ -98,8 +98,9 @@ export function SaveDialog({ tokens, fileHasChanged }: SaveDialogProps) {
 
     try {
       await saveTokenFile(tokens, selectedFormats);
+      console.log("saved");
     } catch (error) {
-      error;
+      console.log(error);
     }
   }
 
