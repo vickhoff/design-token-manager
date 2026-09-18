@@ -1,8 +1,7 @@
 "use client";
-import { serializeCssTokens } from "@/lib/tokens/serializers";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { DEFAULT_TOKENS, loadTokenFile } from "@/lib/tokenFileSystem";
+import { loadTokenFile, loadSampleTokens } from "@/lib/tokenFileSystem";
 
 import {
   Card,
@@ -53,6 +52,12 @@ export default function Dashboard() {
       setStatus("empty");
     }
   }
+
+  function handleChooseSampleTokens() {
+    const { rawFile, jsonFile } = loadSampleTokens();
+    dispatch(setTokenFile({ rawFile, jsonFile, originalFile: jsonFile }));
+  }
+
   function handleReset() {
     dispatch(clearTokenFile());
   }
@@ -124,7 +129,11 @@ export default function Dashboard() {
               <Button className="w-full" onClick={handleChooseFolder}>
                 Choose folder
               </Button>
-              <Button variant="outline" className="w-full">
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={handleChooseSampleTokens}
+              >
                 Start with sample tokens
               </Button>
             </CardFooter>
