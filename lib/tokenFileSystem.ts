@@ -90,7 +90,7 @@ export async function loadTokenFile() {
 }
 
 export function loadSampleTokens() {
-  const rawFile = { title: "sample-tokens.json", content: SAMPLE_TOKENS_JSON };
+  const rawFile = { title: "tokens", content: SAMPLE_TOKENS_JSON };
   const jsonFile = parseJsonTokens(SAMPLE_TOKENS_JSON);
 
   return { rawFile, jsonFile };
