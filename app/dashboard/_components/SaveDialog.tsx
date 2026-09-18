@@ -29,6 +29,9 @@ import {
 } from "@/components/ui/field";
 
 import { ReactElement, useState } from "react";
+import { saveTokenFile } from "@/lib/tokenFileSystem";
+
+import type { Token } from "@/lib/tokens/types";
 
 type CheckBox = {
   title: string;
@@ -74,13 +77,32 @@ function renderButtonWithDisabledTooltip(
   );
 }
 
-export function SaveDialog({ fileHasChanged }: { fileHasChanged: boolean }) {
+interface SaveDialogProps {
+  tokens: Token[];
+  fileHasChanged: boolean;
+}
+
+export function SaveDialog({ tokens, fileHasChanged }: SaveDialogProps) {
   const [selectedFormats, setSelectedFormats] = useState<
     Record<string, boolean>
   >({
     "JSON file": true,
     "CSS file": true,
   });
+
+  function handleSave() {
+    const formats = {
+      json: selectedFormats["JSON file"],
+      css: selectedFormats["CSS file"],
+    };
+
+    try {
+      saveTokenFile(tokens, formats);
+      console.log(formats);
+    } catch (error) {
+      error;
+    }
+  }
 
   const nothingToSave = !fileHasChanged;
   const noFormatSelected = Object.values(selectedFormats).every((v) => !v);
@@ -103,7 +125,7 @@ export function SaveDialog({ fileHasChanged }: { fileHasChanged: boolean }) {
             This will overwrite the token file.
           </DialogDescription>
         </DialogHeader>
-        <form>
+        <form onSubmit={handleSave}>
           <FieldGroup className="max-w-sm gap-2">
             {checkboxes.map((item, i) => (
               <FieldLabel key={item.title}>
@@ -128,16 +150,16 @@ export function SaveDialog({ fileHasChanged }: { fileHasChanged: boolean }) {
               </FieldLabel>
             ))}
           </FieldGroup>
+          <DialogFooter>
+            <DialogClose render={<Button variant="outline">Cancel</Button>} />
+            {renderButtonWithDisabledTooltip(
+              noFormatSelected,
+              "Save to file",
+              "Choose at least one option",
+              "submit",
+            )}
+          </DialogFooter>
         </form>
-        <DialogFooter>
-          <DialogClose render={<Button variant="outline">Cancel</Button>} />
-          {renderButtonWithDisabledTooltip(
-            noFormatSelected,
-            "Save to file",
-            "Choose at least one option",
-            "submit",
-          )}
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

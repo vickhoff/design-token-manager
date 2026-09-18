@@ -1,4 +1,6 @@
 import { parseCssTokens } from "./tokens/parseTokensCss";
+import { serializeCssTokens, serializeJsonTokens } from "./tokens/serializers";
+import type { Token } from "./tokens/types";
 
 export const DEFAULT_TOKENS = {
   color: {
@@ -42,6 +44,29 @@ export async function loadTokenFile() {
   return { rawFile, jsonFile };
 }
 
-export async function saveTokenFile() {
-  return {};
+export async function saveTokenFile(
+  tokens: Token[],
+  selectedFormats: { json: boolean; css: boolean },
+) {
+  if (!directoryHandle) {
+    const root = await getFolder();
+    directoryHandle = root;
+  }
+  if (
+    (await directoryHandle.requestPermission({ mode: "readwrite" })) ===
+    "granted"
+  ) {
+    let jsonTokens: string | undefined;
+    let cssTokens: string | undefined;
+
+    if (selectedFormats.css) {
+      cssTokens = serializeCssTokens(tokens);
+    }
+    if (selectedFormats.json) {
+      jsonTokens = serializeJsonTokens(tokens);
+    }
+
+    return { cssTokens, jsonTokens };
+  }
+  throw new Error("No access granted");
 }
