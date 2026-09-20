@@ -19,7 +19,7 @@
   --color-surface-primary: light-dark(#0a0a0a, #ffffff);
   --color-surface-primary-hover: light-dark(#16a34a, #16a34a);
   --color-surface-subtle: light-dark(#e3e3e3, #1e293b);
-  --color-surface-subtler: light-dark(#eeeeee, #1e293b);
+  --color-surface-subtler: light-dark(#f0f0f0, #282828);
   --color-surface-dark: light-dark(#151a27, #151a27);
 
   --color-foreground-accent: light-dark(#4ade80, #4ade80);

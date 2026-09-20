@@ -11,6 +11,9 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { TriangleAlert, X } from "lucide-react";
+
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "@/components/ui/toast";
 
@@ -93,9 +96,14 @@ function renderButtonWithDisabledTooltip(
 interface SaveDialogProps {
   tokens: Token[];
   fileHasChanged: boolean;
+  hasWarnings: boolean;
 }
 
-export function SaveDialog({ tokens, fileHasChanged }: SaveDialogProps) {
+export function SaveDialog({
+  hasWarnings,
+  tokens,
+  fileHasChanged,
+}: SaveDialogProps) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedFormats, setSelectedFormats] = useState<
@@ -170,6 +178,15 @@ export function SaveDialog({ tokens, fileHasChanged }: SaveDialogProps) {
               </FieldLabel>
             ))}
           </FieldGroup>
+          {hasWarnings ?? (
+            <Alert variant="warning" className="max-w-md self-center">
+              <TriangleAlert />
+              <AlertTitle> The unidentified tokens wont be saved</AlertTitle>
+              <AlertDescription className="text-foreground-on-warning">
+                Scroll down to see the unidentified tokens.
+              </AlertDescription>
+            </Alert>
+          )}
           <DialogFooter>
             <DialogClose render={<Button variant="outline">Cancel</Button>} />
             {renderButtonWithDisabledTooltip(

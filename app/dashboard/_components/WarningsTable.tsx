@@ -28,7 +28,7 @@ export function WarningsTable({ warnings, index }: WarningsTableProps) {
       style={{ animationDelay: `${index * 100}ms` }}
       className="animate-in fade-in slide-in-from-top-4 duration-300 fill-mode-both bg-surface-default border border-border-warning rounded-(--radius-xl) p-4 w-full"
     >
-      <h2 className="font-medium">Undefined tokens ({warnings.length})</h2>
+      <h2 className="font-medium">Unidentified tokens ({warnings.length})</h2>
       <Table className="table-fixed">
         <TableHeader>
           <TableRow>
@@ -54,7 +54,7 @@ export function WarningsTable({ warnings, index }: WarningsTableProps) {
                 </TableCell>
                 <TableCell>
                   <span className="flex items-center gap-1.5">
-                    <Field>{warning.reason}</Field>
+                    {warning.reason}
                   </span>
                 </TableCell>
               </TableRow>

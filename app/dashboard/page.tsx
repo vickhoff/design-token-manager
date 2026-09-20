@@ -27,6 +27,11 @@ import {
 } from "@/lib/state/features/tokenFile/tokenFileSlice";
 
 import { Label } from "@/components/ui/label";
+import {
+  Collapsible,
+  CollapsibleTrigger,
+  CollapsibleContent,
+} from "@/components/ui/collapsible";
 import { WarningsTable } from "./_components/WarningsTable";
 
 type Status = "empty" | "loading" | "error";
@@ -40,6 +45,7 @@ export default function Dashboard() {
     JSON.stringify(jsonFile?.tokens) !== JSON.stringify(originalFile?.tokens);
   const isLoaded = jsonFile !== null;
   const hasWarnings = jsonFile !== null && jsonFile.warnings.length > 0;
+
   const [status, setStatus] = useState<Status>("empty");
 
   const dispatch = useAppDispatch();
@@ -94,6 +100,7 @@ export default function Dashboard() {
                 <SaveDialog
                   tokens={jsonFile.tokens}
                   fileHasChanged={fileHasChanged}
+                  hasWarnings={hasWarnings}
                 />
               </CardContent>
               {hasWarnings && (
@@ -116,7 +123,7 @@ export default function Dashboard() {
             ))}
             {hasWarnings && (
               <WarningsTable
-                index={jsonFile.tokens.length}
+                index={Object.entries(sortedGrouped).length}
                 warnings={jsonFile.warnings}
               />
             )}
@@ -124,7 +131,7 @@ export default function Dashboard() {
         )}
 
         {!isLoaded && status === "empty" && (
-          <Card className="w-full max-w-md text-center">
+          <Card className="w-full max-w-md text-center animate-in fade-in slide-in-from-top-4 duration-300 fill-mode-both">
             <CardHeader>
               <CardTitle>Choose folder</CardTitle>
               <CardDescription>
@@ -132,6 +139,61 @@ export default function Dashboard() {
                 tokens.css or tokens.json
               </CardDescription>
             </CardHeader>
+            <CardContent>
+              <Collapsible>
+                <CollapsibleTrigger
+                  render={
+                    <button className="text-sm text-foreground-muted underline underline-offset-2">
+                      How should I format the file?
+                    </button>
+                  }
+                />
+                <CollapsibleContent className="text-sm text-foreground-muted text-left space-y-4 pt-3">
+                  <div className="space-y-4">
+                    <p>
+                      <strong>If you upload tokens.css</strong> — each token
+                      should be written as a CSS variable, like{" "}
+                      <code className="py-0.5 px-1 bg-surface-subtler rounded  border border-border-default">
+                        --color-brand-primary
+                      </code>
+                      . The name shows what kind of token it is and how it's
+                      grouped.
+                    </p>
+                    <pre className="bg-surface-subtler border border-border-default rounded-(--radius-md) p-3 overflow-x-auto text-xs font-mono">
+                      {`:root {
+  --color-brand-primary: #2563eb;
+  --dimension-spacing-lg: 16px;
+  --typography-weight-bold: 700;
+}`}
+                    </pre>
+                  </div>
+                  <div className="space-y-1.5">
+                    <p>
+                      <strong>If you upload tokens.json</strong> — each token is
+                      an object with a <code>$type</code> and{" "}
+                      <code>$value</code>, grouped and nested by name.
+                    </p>
+                    <pre className="bg-surface-subtler border border-border-default rounded-(--radius-md) p-3 overflow-x-auto text-xs font-mono">
+                      {`{
+  "color": {
+    "brand": {
+      "primary": { "$type": "color", "$value": "#2563eb" }
+    }
+  },
+  "dimension": {
+    "spacing": {
+      "lg": {
+        "$type": "dimension",
+        "$value": { "value": 16, "unit": "px" }
+      }
+    }
+  }
+}`}
+                    </pre>
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+            </CardContent>
             <CardFooter className="flex-col gap-2">
               <Button className="w-full" onClick={handleChooseFolder}>
                 Choose folder
