@@ -11,6 +11,9 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 
+import { Spinner } from "@/components/ui/spinner";
+import { toast } from "@/components/ui/toast";
+
 import {
   Tooltip,
   TooltipContent,
@@ -56,6 +59,7 @@ function renderButtonWithDisabledTooltip(
   isDisabled: boolean,
   buttonText: string,
   tooltipText: string,
+  isLoading: boolean,
   type?: React.ComponentProps<typeof Button>["type"],
 ): ReactElement {
   return isDisabled ? (
@@ -64,7 +68,7 @@ function renderButtonWithDisabledTooltip(
         render={
           <span className="inline-block w-fit">
             <Button type={type} disabled variant="default">
-              {buttonText}
+              {isLoading ? <Spinner /> : buttonText}
             </Button>
           </span>
         }
@@ -74,8 +78,14 @@ function renderButtonWithDisabledTooltip(
       </TooltipContent>
     </Tooltip>
   ) : (
-    <Button variant="default" type={type}>
-      {buttonText}
+    <Button
+      variant="default"
+      type={type}
+      className="relative"
+      disabled={isLoading}
+    >
+      <span className={isLoading ? "invisible" : undefined}>{buttonText}</span>
+      {isLoading && <Spinner className="absolute inset-0 m-auto" />}
     </Button>
   );
 }
@@ -86,6 +96,8 @@ interface SaveDialogProps {
 }
 
 export function SaveDialog({ tokens, fileHasChanged }: SaveDialogProps) {
+  const [open, setOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [selectedFormats, setSelectedFormats] = useState<
     Record<CheckBox["key"], boolean>
   >({
@@ -97,8 +109,15 @@ export function SaveDialog({ tokens, fileHasChanged }: SaveDialogProps) {
     e.preventDefault();
 
     try {
+      setIsLoading(true);
       await saveTokenFile(tokens, selectedFormats);
-      console.log("saved");
+      setIsLoading(false);
+      setOpen(false);
+      toast.add({
+        title: "Saved",
+        description: "Your tokens have been saved.",
+        type: "success",
+      });
     } catch (error) {
       console.log(error);
     }
@@ -108,12 +127,13 @@ export function SaveDialog({ tokens, fileHasChanged }: SaveDialogProps) {
   const noFormatSelected = Object.values(selectedFormats).every((v) => !v);
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
         render={renderButtonWithDisabledTooltip(
           nothingToSave,
           "Save",
           "Edit a token to enable saving",
+          false,
         )}
       />
 
@@ -156,6 +176,7 @@ export function SaveDialog({ tokens, fileHasChanged }: SaveDialogProps) {
               noFormatSelected,
               "Save to file",
               "Choose at least one option",
+              isLoading,
               "submit",
             )}
           </DialogFooter>
