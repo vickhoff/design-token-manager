@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import Logo from "@/components/Logo";
 import { DropdownMenuThemeSwitchItem } from "@/components/theme-toggle";
 import { ArrowLeft } from "lucide-react";
-import { useAppSelector, useAppDispatch } from "@/lib/hooks";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import {
@@ -18,15 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { clearTokenFile } from "@/lib/state/features/tokenFile/tokenFileSlice";
-
 function ToolBar() {
-  const rawFile = useAppSelector((state) => state.tokenFile.rawFile);
-  const dispatch = useAppDispatch();
-
-  function handleReset() {
-    dispatch(clearTokenFile());
-  }
   return (
     <div className="grid grid-cols-3 items-center border bg-surface-default rounded-lg p-4 m-2">
       <div className="justify-self-start">
@@ -58,7 +49,11 @@ function ToolBar() {
           <DropdownMenuContent className="w-56">
             <DropdownMenuItem>Settings</DropdownMenuItem>
             <DropdownMenuThemeSwitchItem />
-            <DropdownMenuItem variant="destructive">Sign out</DropdownMenuItem>
+            <Link href="/">
+              <DropdownMenuItem variant="destructive">
+                Sign out
+              </DropdownMenuItem>
+            </Link>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
