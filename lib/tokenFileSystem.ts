@@ -85,7 +85,7 @@ export async function loadTokenFile() {
     rawFile.title === "tokens.json"
       ? parseJsonTokens(rawFile.content)
       : parseCssTokens(rawFile.content);
-
+  console.log(jsonFile);
   return { rawFile, jsonFile };
 }
 

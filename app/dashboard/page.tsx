@@ -27,6 +27,7 @@ import {
 } from "@/lib/state/features/tokenFile/tokenFileSlice";
 
 import { Label } from "@/components/ui/label";
+import { WarningsTable } from "./_components/WarningsTable";
 
 type Status = "empty" | "loading" | "error";
 
@@ -113,6 +114,12 @@ export default function Dashboard() {
             {Object.entries(sortedGrouped).map(([type, tokens], i) => (
               <TokenTable index={i} key={type} type={type} tokens={tokens} />
             ))}
+            {hasWarnings && (
+              <WarningsTable
+                index={jsonFile.tokens.length}
+                warnings={jsonFile.warnings}
+              />
+            )}
           </section>
         )}
 
