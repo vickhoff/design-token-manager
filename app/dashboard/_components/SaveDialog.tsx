@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 
 import { Spinner } from "@/components/ui/spinner";
+import { toast } from "@/components/ui/toast";
 
 import {
   Tooltip,
@@ -112,6 +113,11 @@ export function SaveDialog({ tokens, fileHasChanged }: SaveDialogProps) {
       await saveTokenFile(tokens, selectedFormats);
       setIsLoading(false);
       setOpen(false);
+      toast.add({
+        title: "Saved",
+        description: "Your tokens have been saved.",
+        type: "success",
+      });
     } catch (error) {
       console.log(error);
     }
