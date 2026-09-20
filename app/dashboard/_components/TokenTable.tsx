@@ -21,6 +21,7 @@ import { updateTokenFile } from "@/lib/state/features/tokenFile/tokenFileSlice";
 interface TokenTableProps {
   type: string;
   tokens: Token[];
+  index: number;
 }
 
 function renderIcon(type: string) {
@@ -43,7 +44,7 @@ function renderIcon(type: string) {
   }
 }
 
-export function TokenTable({ type, tokens }: TokenTableProps) {
+export function TokenTable({ type, tokens, index }: TokenTableProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [colorValues, setColorValues] = useState<Record<string, string>>({});
   const [inputValues, setInputValues] = useState<Record<string, string>>({});
@@ -51,7 +52,10 @@ export function TokenTable({ type, tokens }: TokenTableProps) {
   const dispatch = useAppDispatch();
 
   return (
-    <section className="bg-surface-default border border-border-default rounded-(--radius-xl) p-4 w-full">
+    <section
+      style={{ animationDelay: `${index * 100}ms` }}
+      className="animate-in fade-in slide-in-from-top-4 duration-300 fill-mode-both bg-surface-default border border-border-default rounded-(--radius-xl) p-4 w-full"
+    >
       <h2 className="font-medium">
         {firstLetterUpperCase(type)} ({tokens.length})
       </h2>

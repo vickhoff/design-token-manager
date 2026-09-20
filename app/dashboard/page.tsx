@@ -110,8 +110,8 @@ export default function Dashboard() {
                 </CardFooter>
               )}
             </Card>
-            {Object.entries(sortedGrouped).map(([type, tokens]) => (
-              <TokenTable key={type} type={type} tokens={tokens} />
+            {Object.entries(sortedGrouped).map(([type, tokens], i) => (
+              <TokenTable index={i} key={type} type={type} tokens={tokens} />
             ))}
           </section>
         )}
