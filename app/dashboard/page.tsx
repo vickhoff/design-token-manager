@@ -144,7 +144,7 @@ export default function Dashboard() {
                 <CollapsibleTrigger
                   render={
                     <button className="text-sm text-foreground-muted underline underline-offset-2">
-                      How should I format the file?
+                      How should the file be formatted?
                     </button>
                   }
                 />
